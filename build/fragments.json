@@ -1,0 +1,20 @@
+[
+  "src/fragments/00-bootstrap.lua",
+  "src/fragments/10-input-and-assets.lua",
+  "src/fragments/20-visuals.lua",
+  "src/fragments/30-watermark.lua",
+  "src/fragments/40-shell.lua",
+  "src/fragments/50-navigation.lua",
+  "src/fragments/60-overlay-and-dialogs.lua",
+  "src/fragments/70-window.lua",
+  "src/fragments/80-window-utilities.lua",
+  "src/fragments/90-module-card.lua",
+  "src/fragments/100-module-state.lua",
+  "src/fragments/110-module-settings.lua",
+  "src/fragments/120-controls-basic.lua",
+  "src/fragments/130-controls-slider.lua",
+  "src/fragments/140-controls-dropdown.lua",
+  "src/fragments/150-controls-multi-dropdown.lua",
+  "src/fragments/160-controls-color.lua",
+  "src/fragments/170-controls-bind-and-export.lua"
+]

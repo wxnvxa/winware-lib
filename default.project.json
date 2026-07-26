@@ -1,0 +1,11 @@
+{
+  "name": "WinWareLib",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "WinWareLib": {
+        "$path": "src"
+      }
+    }
+  }
+}
