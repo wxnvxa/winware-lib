@@ -4,10 +4,15 @@ local WinWare = loadstring(game:HttpGet(
 ))()
 
 local window = WinWare:CreateWindow({
-	Title = "WINWARE",
+	Name = "WINWARE",
+	Content = "",
+	Size = WinWare.Scales.Default,
+	Keybind = "Insert",
+})
+
+window:SetAccount({
 	Username = "korsHuesos",
 	Expires = "Until August 15, 2026",
-	Keybind = Enum.KeyCode.Insert,
 })
 
 window:AddTabLabel("MODULES")
@@ -21,15 +26,15 @@ window:AddTab({ Name = "Settings", Icon = "settings" })
 window:AddTab({ Name = "Config Manager", Icon = "file" })
 
 local ragebot = combat:AddSection({ Name = "RAGEBOT", Position = "left" })
-ragebot:AddToggle({ Name = "Enabled", Flag = "Ragebot.Enabled" })
-ragebot:AddToggle({ Name = "TeamCheck", Flag = "Ragebot.TeamCheck" })
-ragebot:AddToggle({ Name = "AutoFire", Flag = "Ragebot.AutoFire", Default = true })
-ragebot:AddSlider({ Name = "FOV", Flag = "Ragebot.FOV", Min = 0, Max = 180, Default = 90 })
-ragebot:AddDropdown({ Name = "Target", Flag = "Ragebot.Target", Default = "Head", Values = { "Head", "Torso", "Closest" } })
+ragebot:AddLabel("Enabled"):AddToggle({ Flag = "Ragebot.Enabled" })
+ragebot:AddLabel("TeamCheck"):AddToggle({ Flag = "Ragebot.TeamCheck" })
+ragebot:AddLabel("AutoFire"):AddToggle({ Flag = "Ragebot.AutoFire", Default = true })
+ragebot:AddLabel("FOV"):AddSlider({ Flag = "Ragebot.FOV", Min = 0, Max = 180, Default = 90, Size = 233 })
+ragebot:AddLabel("Target"):AddDropdown({ Flag = "Ragebot.Target", Default = "Head", Values = { "Head", "Torso", "Closest" }, Size = 100 })
 
 local aimbot = combat:AddSection({ Name = "AIMBOT", Position = "right" })
-aimbot:AddToggle({ Name = "Enabled", Flag = "Aimbot.Enabled" })
-aimbot:AddToggle({ Name = "TeamCheck", Flag = "Aimbot.TeamCheck" })
-aimbot:AddToggle({ Name = "AutoFire", Flag = "Aimbot.AutoFire", Default = true })
-aimbot:AddSlider({ Name = "FOV", Flag = "Aimbot.FOV", Min = 0, Max = 180, Default = 90 })
-aimbot:AddDropdown({ Name = "Target", Flag = "Aimbot.Target", Default = "Head", Values = { "Head", "Torso", "Closest" } })
+aimbot:AddLabel("Enabled"):AddToggle({ Flag = "Aimbot.Enabled" })
+aimbot:AddLabel("TeamCheck"):AddToggle({ Flag = "Aimbot.TeamCheck" })
+aimbot:AddLabel("AutoFire"):AddToggle({ Flag = "Aimbot.AutoFire", Default = true })
+aimbot:AddLabel("FOV"):AddSlider({ Flag = "Aimbot.FOV", Min = 0, Max = 180, Default = 90, Size = 233 })
+aimbot:AddLabel("Target"):AddDropdown({ Flag = "Aimbot.Target", Default = "Head", Values = { "Head", "Torso", "Closest" }, Size = 100 })

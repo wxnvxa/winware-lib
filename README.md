@@ -20,3 +20,13 @@ npm test
 ```
 
 `npm run check` uses the local Luau compiler when available, otherwise the compiler from the sibling `winware` workspace.
+
+## WinWare Figma build
+
+The NeverLose-based WinWare Figma port and its standalone example are available in [`figma/`](figma/README.md).
+
+```luau
+loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/wxnvxa/winware-lib/main/figma/example.luau"
+))()
+```

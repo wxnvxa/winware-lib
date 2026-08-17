@@ -1,22 +1,18 @@
-# WinWare UI Library
+# WinWare Figma UI
 
-WinWare is a Roblox client UI library that recreates the WinWare Figma design: a centered dark glass window, navigation sidebar, profile block, two-column sections, toggles, sliders, and dropdowns.
+Native Roblox/Luau port of the WinWare Figma interface. This build now uses the original MIT-licensed NeverLose implementation as its base, preserving its window, signals, tabs, sections, handlers, overlays, flags, config helpers, drag behavior, and control API.
 
-The implementation is derived from the MIT-licensed NeverLose Roblox UI project by 4lpacaLoL. The original copyright and MIT license are retained in `LICENSE`.
+The default window is `834x534`, the original `1250x800` Figma surface reduced by 1.5. It does not automatically upscale to the viewport.
 
-## Install
-
-Place `winware.luau` in a ModuleScript and require it from a LocalScript:
+## Run the complete example
 
 ```luau
-local WinWare = require(path.to.winware)
+loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/wxnvxa/winware-lib/main/figma/example.luau"
+))()
 ```
 
-The library renders into `Players.LocalPlayer.PlayerGui`, so it works in a normal Roblox client environment.
-
-## Remote loading
-
-For environments that explicitly provide both `loadstring` and `game:HttpGet`, load the published Figma build directly:
+## Load only the library
 
 ```luau
 local WinWare = loadstring(game:HttpGet(
@@ -24,46 +20,41 @@ local WinWare = loadstring(game:HttpGet(
 ))()
 ```
 
-In a normal Roblox experience, use a ModuleScript and `require` instead. Standard Roblox clients do not enable `loadstring` for arbitrary remote source.
-
-## Minimal example
+## API example
 
 ```luau
-local WinWare = require(path.to.winware)
-
 local window = WinWare:CreateWindow({
-    Title = "WINWARE",
-    Username = "korsHuesos",
-    Expires = "Until August 15, 2026",
-    Keybind = Enum.KeyCode.Insert,
+    Name = "WINWARE",
+    Content = "",
+    Size = WinWare.Scales.Default,
+    Keybind = "Insert",
 })
 
 window:AddTabLabel("MODULES")
 local combat = window:AddTab({ Name = "Combat", Icon = "swords" })
-
 local ragebot = combat:AddSection({ Name = "RAGEBOT", Position = "left" })
-ragebot:AddToggle({ Name = "Enabled", Flag = "Ragebot.Enabled" })
-ragebot:AddSlider({ Name = "FOV", Flag = "Ragebot.FOV", Min = 0, Max = 180, Default = 90 })
-ragebot:AddDropdown({
-    Name = "Target",
-    Flag = "Ragebot.Target",
+
+ragebot:AddLabel("Enabled"):AddToggle({
+    Default = false,
+    Flag = "Ragebot.Enabled",
+})
+
+ragebot:AddLabel("FOV"):AddSlider({
+    Default = 90,
+    Min = 0,
+    Max = 180,
+    Size = 233,
+    Flag = "Ragebot.FOV",
+})
+
+ragebot:AddLabel("Target"):AddDropdown({
     Default = "Head",
     Values = { "Head", "Torso", "Closest" },
+    Size = 100,
+    Flag = "Ragebot.Target",
 })
 ```
 
-`WinWare.Flags` stores every option that supplies a `Flag`.
+Controls with a `Flag` are available through `WinWare.Flags[flag]` and retain the base `GetValue`/`SetValue` methods.
 
-## API
-
-- `WinWare:CreateWindow(config)`
-- `window:AddTabLabel(text)`
-- `window:AddTab({ Name, Icon })`
-- `window:SetAccount({ Username, Expires, Profile })`
-- `window:SetScale(number)`
-- `window:ToggleInterface(boolean?)`
-- `window:Destroy()`
-- `tab:AddSection({ Name, Position = "left" | "right" })`
-- `section:AddToggle({ Name, Default, Flag, Callback })`
-- `section:AddSlider({ Name, Min, Max, Default, Flag, Callback })`
-- `section:AddDropdown({ Name, Values, Default, Flag, Callback })`
+The upstream copyright and MIT license are retained in `LICENSE`.
