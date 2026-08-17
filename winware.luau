@@ -1994,7 +1994,7 @@ function NeverLose:CreateModuleOptionWindow(Trigger: Frame, Zindex, Config)
 	Title.ZIndex = Header.ZIndex + 1
 	Title.FontFace = NeverLose.MontserratSemiBold
 	Title.Text = Config.Name
-	Title.TextColor3 = Color3.fromRGB(219, 219, 219)
+	Title.TextColor3 = Color3.fromRGB(206, 206, 206)
 	Title.TextSize = 14
 	Title.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -2055,6 +2055,28 @@ function NeverLose:CreateModuleOptionWindow(Trigger: Frame, Zindex, Config)
 			Root.Parent = NeverLose.Global3DRenderMode and NeverLose.GlobalSurfaceGui or NeverLose.ScreenGui
 			Root.Visible = true
 			Root.Size = UDim2.fromOffset(Config.Width - 8, Config.Height - 8)
+
+			local MainFrame = NeverLose.MainWindowFrame;
+
+			if MainFrame and MainFrame.Parent then
+				local FramePosition = MainFrame.AbsolutePosition;
+				local FrameSize = MainFrame.AbsoluteSize;
+				local Viewport = NeverLose.ScreenGui.AbsoluteSize;
+				local TargetX = FramePosition.X + FrameSize.X + 14 + (Config.Width / 2);
+				local TargetY = FramePosition.Y + (Config.Height / 2);
+
+				if Viewport.X > 0 and TargetX + (Config.Width / 2) > Viewport.X - 8 then
+					TargetX = FramePosition.X - 14 - (Config.Width / 2);
+				end
+
+				if Viewport.Y > 0 then
+					local MinY = (Config.Height / 2) + 8;
+					local MaxY = math.max(MinY, Viewport.Y - (Config.Height / 2) - 8);
+					TargetY = math.clamp(TargetY, MinY, MaxY);
+				end
+
+				Root.Position = UDim2.fromOffset(TargetX, TargetY);
+			end
 			NeverLose.PlayAnimate(Root, SlowyTween, {
 				BackgroundTransparency = 0.02,
 				Size = UDim2.fromOffset(Config.Width, Config.Height),
@@ -3251,7 +3273,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		ValueLabel.ZIndex = ZINdex + 14
 		ValueLabel.FontFace = NeverLose.MontserratMedium
 		ValueLabel.Text = NeverLose:KeyCodeToStr(Config.Default or "None")
-		ValueLabel.TextColor3 = Color3.fromRGB(219, 219, 219)
+		ValueLabel.TextColor3 = Color3.fromRGB(206, 206, 206)
 		ValueLabel.TextSize = 12.000
 		ValueLabel.TextTransparency = 0.050
 
@@ -3406,7 +3428,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		TextBox.FontFace = NeverLose.MontserratMedium
 		TextBox.PlaceholderText = Config.Placeholder
 		TextBox.Text = tostring(Config.Default)
-		TextBox.TextColor3 = Color3.fromRGB(219, 219, 219)
+		TextBox.TextColor3 = Color3.fromRGB(206, 206, 206)
 		TextBox.TextSize = 13.000
 		TextBox.TextTransparency = 0.050
 		TextBox.TextXAlignment = Enum.TextXAlignment.Left
@@ -3802,7 +3824,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 				ItemLabel.ZIndex = ZINdex + 1258
 				ItemLabel.FontFace = NeverLose.MontserratMedium
 				ItemLabel.Text = tostring(Value);
-				ItemLabel.TextColor3 = Color3.fromRGB(219, 219, 219)
+				ItemLabel.TextColor3 = Color3.fromRGB(206, 206, 206)
 				ItemLabel.TextSize = 13.000
 				ItemLabel.TextTransparency = 0.200
 				ItemLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -3812,7 +3834,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 				ItemStroke.Color = Color3.fromRGB(255, 255, 255)
 				ItemStroke.Thickness = 1
 				ItemStroke.Transparency = 1
-				ItemStroke.Parent = ItemFrame
+				ItemStroke.Parent = nil
 				local sizetext = TextService:GetTextSize(ItemLabel.Text , ItemLabel.TextSize,NeverLose.TextMetricFont,Vector2.new(math.huge,math.huge));
 
 				DropdownLib.ExtentSize = math.max(DropdownLib.ExtentSize , sizetext.X);
@@ -3871,7 +3893,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 
 							NeverLose.PlayAnimate(ItemLabel , VSlowTween , {
 								TextTransparency = 0.5,
-								TextColor3 = Color3.fromRGB(219, 219, 219),
+								TextColor3 = Color3.fromRGB(206, 206, 206),
 								Position = UDim2.new(0, 15, 0, 4)
 							})
 						end;
@@ -3903,7 +3925,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 							})
 							NeverLose.PlayAnimate(ItemLabel , SlowyTween , {
 								TextTransparency = 0.5,
-								TextColor3 = Color3.fromRGB(219, 219, 219)
+								TextColor3 = Color3.fromRGB(206, 206, 206)
 							})
 						end;
 					end);
@@ -4297,13 +4319,14 @@ function NeverLose:RegisiterItem(Frame: Frame , Signel)
 		LineFrame.Name = NeverLose.RandomString();
 		LineFrame.Parent = BasedFrame
 		LineFrame.Visible = false
+		LineFrame:SetAttribute("RowDivider", true)
 		LineFrame.AnchorPoint = Vector2.new(0.5, 1)
 		LineFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		LineFrame.BackgroundTransparency = 0.970
 		LineFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		LineFrame.BorderSizePixel = 0
 		LineFrame.Position = UDim2.new(0.5, 0, 1, 0)
-		LineFrame.Size = UDim2.new(1, -20, 0, 1)
+		LineFrame.Size = UDim2.new(1, -30, 0, 2)
 		LineFrame.ZIndex = LayerIndex + 11
 
 		BasedHandler.Name = NeverLose.RandomString();
@@ -4462,7 +4485,7 @@ function NeverLose:RegisiterItem(Frame: Frame , Signel)
 		LineFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		LineFrame.BorderSizePixel = 0
 		LineFrame.Position = UDim2.new(0.5, 0, 1, 0)
-		LineFrame.Size = UDim2.new(1, -20, 0, 1)
+		LineFrame.Size = UDim2.new(1, -30, 0, 2)
 		LineFrame.ZIndex = LayerIndex + 11
 
 		UICorner.CornerRadius = UDim.new(0, 9)
@@ -4602,7 +4625,7 @@ function NeverLose:RegisiterItem(Frame: Frame , Signel)
 		LineFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		LineFrame.BorderSizePixel = 0
 		LineFrame.Position = UDim2.new(0.5, 0, 1, 0)
-		LineFrame.Size = UDim2.new(1, -20, 0, 1)
+		LineFrame.Size = UDim2.new(1, -30, 0, 2)
 		LineFrame.ZIndex = LayerIndex + 11
 
 		UICorner.CornerRadius = UDim.new(0, 10)
@@ -4776,6 +4799,7 @@ function NeverLose:CreateWindow(Config)
 
 	WindowFrame.Name = NeverLose.RandomString();
 	WindowFrame.Parent = NeverLose.ScreenGui;
+	NeverLose.MainWindowFrame = WindowFrame;
 	WindowFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 	WindowFrame.BackgroundColor3 = Color3.fromRGB(11, 11, 11)
 	WindowFrame.BackgroundTransparency = 0.100
@@ -5599,7 +5623,7 @@ function NeverLose:CreateWindow(Config)
 		TabLabel.ZIndex = 8
 		TabLabel.FontFace = NeverLose.MontserratSemiBold
 		TabLabel.Text = Name
-		TabLabel.TextColor3 = Color3.fromRGB(51, 51, 51)
+		TabLabel.TextColor3 = Color3.fromRGB(76, 76, 76)
 		TabLabel.TextSize = 10.000
 		TabLabel.TextTransparency = 0
 		TabLabel.TextXAlignment = Enum.TextXAlignment.Center
@@ -5807,7 +5831,7 @@ function NeverLose:CreateWindow(Config)
 
 				NeverLose.PlayAnimate(TabContentLabel , SlowyTween , {
 					TextTransparency = 0,
-					TextColor3 = Color3.fromRGB(219, 219, 219)
+					TextColor3 = Color3.fromRGB(206, 206, 206)
 				})
 			end;
 		end);
@@ -5870,8 +5894,8 @@ function NeverLose:CreateWindow(Config)
 
 			SectionFrame.Name = NeverLose.RandomString();
 			SectionFrame.Parent = (string.lower(Config.Position) == 'left' and LeftScroll) or RightScroll
-			SectionFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			SectionFrame.BackgroundTransparency = 1.000
+			SectionFrame.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
+			SectionFrame.BackgroundTransparency = 0.000
 			SectionFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			SectionFrame.BorderSizePixel = 0
 			SectionFrame.ClipsDescendants = false
@@ -5890,7 +5914,7 @@ function NeverLose:CreateWindow(Config)
 			SectionLabel.ZIndex = 9
 			SectionLabel.FontFace = NeverLose.MontserratSemiBold
 			SectionLabel.Text = Config.Name
-			SectionLabel.TextColor3 = Color3.fromRGB(51, 51, 51)
+			SectionLabel.TextColor3 = Color3.fromRGB(76, 76, 76)
 			SectionLabel.TextSize = 14.000
 			SectionLabel.TextTransparency = 0
 			SectionLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -5918,6 +5942,32 @@ function NeverLose:CreateWindow(Config)
 			UIListLayout.Parent = SectionHandler
 			UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 			UIListLayout.Padding = UDim.new(0, 6)
+
+			local UpdateRowDividers = LPH_NO_VIRTUALIZE(function()
+				local Rows = {};
+
+				for _, Child in ipairs(SectionHandler:GetChildren()) do
+					if Child:IsA("GuiObject") then
+						table.insert(Rows, Child);
+					end
+				end
+
+				for Index, Row in ipairs(Rows) do
+					for _, Item in ipairs(Row:GetDescendants()) do
+						if Item:GetAttribute("RowDivider") then
+							Item.Visible = Index < #Rows;
+						end
+					end
+				end
+			end)
+
+			NeverLose:AddSignal(SectionHandler.ChildAdded:Connect(function()
+				task.defer(UpdateRowDividers);
+			end))
+
+			NeverLose:AddSignal(SectionHandler.ChildRemoved:Connect(function()
+				task.defer(UpdateRowDividers);
+			end))
 
 			local SectionPadding = Instance.new("UIPadding")
 			SectionPadding.PaddingTop = UDim.new(0, 8)
@@ -6157,7 +6207,7 @@ function NeverLose:CreateWindow(Config)
 		LineFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		LineFrame.BorderSizePixel = 0
 		LineFrame.Position = UDim2.new(0.5, 0, 1, 0)
-		LineFrame.Size = UDim2.new(1, -20, 0, 1)
+		LineFrame.Size = UDim2.new(1, -30, 0, 2)
 		LineFrame.ZIndex = 154
 
 		BasedHandler.Name = NeverLose.RandomString();
@@ -6220,7 +6270,7 @@ function NeverLose:CreateWindow(Config)
 		TextBox.FontFace = NeverLose.MontserratMedium
 		TextBox.PlaceholderText = "Config Name ..."
 		TextBox.Text = ""
-		TextBox.TextColor3 = Color3.fromRGB(219, 219, 219)
+		TextBox.TextColor3 = Color3.fromRGB(206, 206, 206)
 		TextBox.TextSize = 13.000
 		TextBox.TextTransparency = 0.050
 		TextBox.TextXAlignment = Enum.TextXAlignment.Left
