@@ -944,6 +944,119 @@ NeverLose.PlayAnimate = LPH_NO_VIRTUALIZE(function(Self , Info , Property)
 	return Tween;
 end);
 
+function NeverLose:EnableTextShimmer(Label: TextLabel, Gradient: UIGradient, Options)
+	if not Label or not Label:IsA("TextLabel") or not Gradient or not Gradient:IsA("UIGradient") then
+		return;
+	end;
+
+	Options = Options or {};
+
+	local BaseColor = Options.BaseColor or Color3.fromRGB(27, 39, 88);
+	local EndColor = Options.EndColor or Color3.fromRGB(0, 86, 255);
+	local PeakColors = Options.PeakColors or { Color3.fromRGB(0, 86, 255), Color3.fromRGB(255, 255, 255) };
+	local BandCount = math.clamp(Options.BandCount or 0.6, 0.25, 3);
+	local BandWidth = math.clamp(Options.BandWidth or 0.7, 0.05, 1);
+	local SweepTime = math.max(Options.SweepTime or 1.5, 0.1);
+	local MaxKeypoints = 20;
+	local Epsilon = 1e-3;
+	local phase = 0;
+	local lastPhase, lastPeriod, lastHalfWidth;
+
+	local function smoothstep(value)
+		return value * value * (3 - 2 * value);
+	end;
+
+	local function baseAt(position)
+		return BaseColor:Lerp(EndColor, math.clamp(position, 0, 1));
+	end;
+
+	local function peakAt(index)
+		local count = #PeakColors;
+		if count == 0 then
+			return EndColor;
+		end;
+
+		return PeakColors[((index % count) + count) % count + 1];
+	end;
+
+	local function colorAt(position, period, halfWidth)
+		local bandIndex = math.floor((position - phase) / period + 0.5);
+		local center = phase + bandIndex * period;
+		local distance = math.abs(position - center);
+		local color = baseAt(position);
+
+		if distance < halfWidth then
+			local amount = smoothstep(1 - distance / halfWidth);
+			color = color:Lerp(peakAt(bandIndex), amount);
+		end;
+
+		return color;
+	end;
+
+	local function buildSequence(period, halfWidth)
+		local positions = {};
+		local first = math.floor(-phase / period) - 1;
+		local last = math.ceil((1 - phase) / period) + 1;
+
+		for bandIndex = first, last do
+			local center = phase + bandIndex * period;
+			for _, offset in next, { -1, 0, 1 } do
+				local position = center + offset * halfWidth;
+				if position > Epsilon and position < 1 - Epsilon then
+					table.insert(positions, position);
+				end;
+			end;
+		end;
+
+		table.sort(positions);
+
+		local keypoints = {
+			ColorSequenceKeypoint.new(0, colorAt(0, period, halfWidth)),
+		};
+		local previous = 0;
+
+		for _, position in next, positions do
+			if #keypoints >= MaxKeypoints - 1 then
+				break;
+			end;
+
+			if position - previous >= Epsilon then
+				table.insert(keypoints, ColorSequenceKeypoint.new(position, colorAt(position, period, halfWidth)));
+				previous = position;
+			end;
+		end;
+
+		table.insert(keypoints, ColorSequenceKeypoint.new(1, colorAt(1, period, halfWidth)));
+		return ColorSequence.new(keypoints);
+	end;
+
+	Label.TextColor3 = Color3.new(1, 1, 1);
+	local RenderSignal = RunService.PreRender or RunService.RenderStepped;
+	if not RenderSignal then
+		return;
+	end;
+
+	NeverLose:AddSignal(RenderSignal:Connect(function(deltaTime)
+		if not Label.Parent or not Label.Visible then
+			return;
+		end;
+
+		local textWidth = math.max(Label.TextBounds.X, 1);
+		local labelWidth = math.max(Label.AbsoluteSize.X, 1);
+		local span = Options.FitToText == false and 1 or math.clamp(textWidth / labelWidth, 0.05, 1);
+		local period = math.max(span / BandCount, 0.08);
+		local halfWidth = math.max(period * 0.5 * BandWidth, 1e-4);
+
+		phase = (phase + (span / SweepTime) * deltaTime) % period;
+		if phase == lastPhase and period == lastPeriod and halfWidth == lastHalfWidth then
+			return;
+		end;
+
+		lastPhase, lastPeriod, lastHalfWidth = phase, period, halfWidth;
+		Gradient.Color = buildSequence(period, halfWidth);
+	end));
+end;
+
 function NeverLose:EnableOverflowMarquee(Label: TextLabel, Options)
 	if not Label or not Label:IsA("TextLabel") or Label:GetAttribute("WinWareMarqueeEnabled") then
 		return;
@@ -4721,6 +4834,15 @@ function NeverLose:CreateWindow(Config)
 		ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 86, 255)),
 	})
 	WindowNameGradient.Rotation = 0
+	NeverLose:EnableTextShimmer(WindowName, WindowNameGradient, {
+		BaseColor = Color3.fromRGB(27, 39, 88),
+		EndColor = Color3.fromRGB(0, 86, 255),
+		PeakColors = { Color3.fromRGB(0, 86, 255), Color3.fromRGB(255, 255, 255) },
+		BandCount = 0.6,
+		BandWidth = 0.7,
+		SweepTime = 1.5,
+		FitToText = true,
+	});
 
 	WindowContent.Name = NeverLose.RandomString();
 	WindowContent.Parent = HeadFrame
