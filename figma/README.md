@@ -8,7 +8,7 @@ The default window is `834x534`, the original `1250x800` Figma surface reduced b
 
 ```luau
 loadstring(game:HttpGet(
-    "https://raw.githubusercontent.com/wxnvxa/winware-lib/main/figma/example.luau"
+	"https://wxnvxa.github.io/winware-lib/figma/example.luau"
 ))()
 ```
 
@@ -16,7 +16,7 @@ loadstring(game:HttpGet(
 
 ```luau
 local WinWare = loadstring(game:HttpGet(
-    "https://raw.githubusercontent.com/wxnvxa/winware-lib/main/figma/winware.luau"
+	"https://wxnvxa.github.io/winware-lib/figma/winware.luau"
 ))()
 ```
 

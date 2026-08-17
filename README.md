@@ -27,6 +27,6 @@ The NeverLose-based WinWare Figma port and its standalone example are available 
 
 ```luau
 loadstring(game:HttpGet(
-    "https://raw.githubusercontent.com/wxnvxa/winware-lib/main/figma/example.luau"
+	"https://wxnvxa.github.io/winware-lib/figma/example.luau"
 ))()
 ```
