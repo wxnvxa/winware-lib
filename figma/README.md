@@ -31,7 +31,7 @@ local window = WinWare:CreateWindow({
 })
 
 window:AddTabLabel("MODULES")
-local combat = window:AddTab({ Name = "Combat", Icon = "swords" })
+local combat = window:AddTab({ Name = "Combat", Icon = "sword" })
 local ragebot = combat:AddSection({ Name = "RAGEBOT", Position = "left" })
 
 ragebot:AddLabel("Enabled"):AddToggle({
