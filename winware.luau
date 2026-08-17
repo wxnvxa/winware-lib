@@ -154,20 +154,37 @@ local NeverLose = {};
 NeverLose.BuiltInRegular = Font.new('rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json',Enum.FontWeight.Regular,Enum.FontStyle.Normal);
 NeverLose.BuiltInBold = Font.new('rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json',Enum.FontWeight.Bold,Enum.FontStyle.Normal);
 local function CreateMontserratFont(weight)
-	local success, font = pcall(function()
-		return Font.fromName("Montserrat", weight, Enum.FontStyle.Normal)
+	local okEnum, enumFont = pcall(function()
+		local font = Font.fromEnum(Enum.Font.Montserrat);
+		font.Weight = weight;
+		font.Style = Enum.FontStyle.Normal;
+		return font;
 	end)
 
-	return success and font or Font.new(
-		"rbxasset://fonts/families/Montserrat.json",
-		weight,
-		Enum.FontStyle.Normal
-	)
+	if okEnum and enumFont then
+		return enumFont;
+	end
+
+	local okAsset, assetFont = pcall(function()
+		return Font.new("rbxasset://fonts/families/Montserrat.json", weight, Enum.FontStyle.Normal)
+	end)
+
+	if okAsset and assetFont then
+		return assetFont;
+	end
+
+	return Font.fromName("Montserrat", weight, Enum.FontStyle.Normal);
 end
 
 NeverLose.MontserratMedium = CreateMontserratFont(Enum.FontWeight.Medium);
 NeverLose.MontserratSemiBold = CreateMontserratFont(Enum.FontWeight.SemiBold);
 NeverLose.MontserratBold = CreateMontserratFont(Enum.FontWeight.Bold);
+
+local okMetricFont, metricFont = pcall(function()
+	return Enum.Font.Montserrat;
+end)
+
+NeverLose.TextMetricFont = (okMetricFont and metricFont) or Enum.Font.GothamMedium;
 NeverLose.GlobalSignals = {};
 NeverLose.UnloadEnabled = false;
 
@@ -1649,6 +1666,21 @@ NeverLose.CreateBlurModule = LPH_NO_VIRTUALIZE(function(self , Frame , Signal)
 	return rbxsignal;
 end);
 
+NeverLose.ApplyPopupSurface = LPH_NO_VIRTUALIZE(function(Frame , Transparency)
+	Frame.BackgroundColor3 = NeverLose.MainColor;
+	Frame.BackgroundTransparency = Transparency or 0.06;
+
+	local SurfaceSignal = {};
+
+	function SurfaceSignal:GetValue()
+		return Frame.Visible and Frame.BackgroundTransparency < 0.9 and Frame.AbsoluteSize.X > 4;
+	end
+
+	NeverLose:CreateBlurModule(Frame , SurfaceSignal);
+
+	return Frame;
+end);
+
 local EmptyFunction = function() end;
 
 function NeverLose:RollingEffect(parent)
@@ -1779,6 +1811,7 @@ function NeverLose:CreateOptionWindow(Frame: Frame , Zindex)
 	OptionHandler.AnchorPoint = Vector2.new(0, 0)
 	OptionHandler.BackgroundColor3 = NeverLose.PopupSurfaceColor
 	OptionHandler.BackgroundTransparency = 0.035
+	NeverLose.ApplyPopupSurface(OptionHandler , 0.035);
 	OptionHandler.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	OptionHandler.BorderSizePixel = 0
 	OptionHandler.ClipsDescendants = true
@@ -1915,6 +1948,7 @@ function NeverLose:CreateModuleOptionWindow(Trigger: Frame, Zindex, Config)
 	Root.AnchorPoint = Vector2.new(0.5, 0.5)
 	Root.BackgroundColor3 = NeverLose.PopupSurfaceColor
 	Root.BackgroundTransparency = 0.02
+	NeverLose.ApplyPopupSurface(Root , 0.02);
 	Root.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	Root.BorderSizePixel = 0
 	Root.ClipsDescendants = true
@@ -2114,6 +2148,7 @@ function NeverLose:CreateColorPicker(HandleFrame: Frame)
 	ColorPickerHandler.AnchorPoint = Vector2.new(0, 0)
 	ColorPickerHandler.BackgroundColor3 = NeverLose.PopupSurfaceColor
 	ColorPickerHandler.BackgroundTransparency = 0.035
+	NeverLose.ApplyPopupSurface(ColorPickerHandler , 0.035);
 	ColorPickerHandler.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	ColorPickerHandler.BorderSizePixel = 0
 	ColorPickerHandler.ClipsDescendants = true
@@ -2625,7 +2660,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 			return UDim2.new(scale, thumbRadius - (thumbSize * scale), 0.5, 0)
 		end)
 
-		local FullNumSize = TextService:GetTextSize(string.rep("0",(Config.Rounding + #tostring(Config.Max))+1)..tostring(Config.Type),10,Enum.Font.GothamMedium,Vector2.new(math.huge,math.huge));
+		local FullNumSize = TextService:GetTextSize(string.rep("0",(Config.Rounding + #tostring(Config.Max))+1)..tostring(Config.Type),10,NeverLose.TextMetricFont,Vector2.new(math.huge,math.huge));
 
 		SliderLib.MaximumSize = FullNumSize.X;
 		SliderLib.MaximumSize = Config.Compact and 40 or 45;
@@ -2634,7 +2669,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 			local nszie = 0;
 
 			for i,ns in next , Config.Nums do
-				local size = TextService:GetTextSize(string.rep("m",string.len(tostring(ns))),10,Enum.Font.GothamMedium,Vector2.new(math.huge,math.huge));
+				local size = TextService:GetTextSize(string.rep("m",string.len(tostring(ns))),10,NeverLose.TextMetricFont,Vector2.new(math.huge,math.huge));
 
 				if nszie < size.X then
 					nszie = size.X;
@@ -3249,7 +3284,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		end);
 
 		function KeybindLib:Update()
-			local size = TextService:GetTextSize(ValueLabel.Text,ValueLabel.TextSize,Enum.Font.GothamMedium,Vector2.new(math.huge,math.huge));
+			local size = TextService:GetTextSize(ValueLabel.Text,ValueLabel.TextSize,NeverLose.TextMetricFont,Vector2.new(math.huge,math.huge));
 
 			NeverLose.PlayAnimate(Keybind , SlowyTween , {
 				Size = UDim2.new(0, math.max(48, size.X + 18), 0, 28)
@@ -3590,6 +3625,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 			DropdownHandler.AnchorPoint = Vector2.new(0.5, 0)
 			DropdownHandler.BackgroundColor3 = NeverLose.PopupSurfaceColor
 			DropdownHandler.BackgroundTransparency = 0.035
+			NeverLose.ApplyPopupSurface(DropdownHandler , 0.035);
 			DropdownHandler.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			DropdownHandler.BorderSizePixel = 0
 			DropdownHandler.ClipsDescendants = true
@@ -3777,7 +3813,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 				ItemStroke.Thickness = 1
 				ItemStroke.Transparency = 1
 				ItemStroke.Parent = ItemFrame
-				local sizetext = TextService:GetTextSize(ItemLabel.Text , ItemLabel.TextSize,Enum.Font.GothamMedium,Vector2.new(math.huge,math.huge));
+				local sizetext = TextService:GetTextSize(ItemLabel.Text , ItemLabel.TextSize,NeverLose.TextMetricFont,Vector2.new(math.huge,math.huge));
 
 				DropdownLib.ExtentSize = math.max(DropdownLib.ExtentSize , sizetext.X);
 
@@ -4073,6 +4109,7 @@ function NeverLose:CreateToolTips(Container: Frame , Name: string , Content: str
 	Tooltips.Name = NeverLose.RandomString();
 	Tooltips.BackgroundColor3 = NeverLose.PopupSurfaceColor
 	Tooltips.BackgroundTransparency = 0.075
+	NeverLose.ApplyPopupSurface(Tooltips , 0.075);
 	Tooltips.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	Tooltips.BorderSizePixel = 0
 	Tooltips.ClipsDescendants = true
@@ -4123,8 +4160,8 @@ function NeverLose:CreateToolTips(Container: Frame , Name: string , Content: str
 	local ToolTip = {};
 
 	ToolTip.Update = LPH_NO_VIRTUALIZE(function()
-		local SizeName = TextService:GetTextSize(TooltipName.Text , TooltipName.TextSize , Enum.Font.GothamBold , Vector2.new(math.huge,math.huge));
-		local SizeContent = TextService:GetTextSize(TooltipContent.Text , TooltipContent.TextSize , Enum.Font.GothamBold , Vector2.new(math.huge,math.huge));
+		local SizeName = TextService:GetTextSize(TooltipName.Text , TooltipName.TextSize , NeverLose.TextMetricFont , Vector2.new(math.huge,math.huge));
+		local SizeContent = TextService:GetTextSize(TooltipContent.Text , TooltipContent.TextSize , NeverLose.TextMetricFont , Vector2.new(math.huge,math.huge));
 
 		local MaxX = math.max(SizeName.X , SizeContent.X) + 65;
 		local MaxY = SizeName.Y + SizeContent.Y + 30;
@@ -4259,6 +4296,7 @@ function NeverLose:RegisiterItem(Frame: Frame , Signel)
 
 		LineFrame.Name = NeverLose.RandomString();
 		LineFrame.Parent = BasedFrame
+		LineFrame.Visible = false
 		LineFrame.AnchorPoint = Vector2.new(0.5, 1)
 		LineFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		LineFrame.BackgroundTransparency = 0.970
@@ -4290,7 +4328,7 @@ function NeverLose:RegisiterItem(Frame: Frame , Signel)
 		UICorner.Parent = BasedFrame
 
 		local UpdateWarp = LPH_NO_VIRTUALIZE(function()
-			local size = TextService:GetTextSize(BasedLabel.Text , BasedLabel.TextSize , Enum.Font.GothamMedium , Vector2.new(math.huge,math.huge));
+			local size = TextService:GetTextSize(BasedLabel.Text , BasedLabel.TextSize , NeverLose.TextMetricFont , Vector2.new(math.huge,math.huge));
 			NeverLose.PlayAnimate(BasedFrame , SlowyTween , {
 				Size = UDim2.new(1, 0, 0, size.Y + 13);
 			})
@@ -5879,6 +5917,12 @@ function NeverLose:CreateWindow(Config)
 
 			UIListLayout.Parent = SectionHandler
 			UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+			UIListLayout.Padding = UDim.new(0, 6)
+
+			local SectionPadding = Instance.new("UIPadding")
+			SectionPadding.PaddingTop = UDim.new(0, 8)
+			SectionPadding.PaddingBottom = UDim.new(0, 8)
+			SectionPadding.Parent = SectionHandler
 			UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
 			UIListLayout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(LPH_NO_VIRTUALIZE(function()
@@ -5890,7 +5934,7 @@ function NeverLose:CreateWindow(Config)
 					})
 				else
 					NeverLose.PlayAnimate(SectionFrame , VSlowTween , {
-						Size = UDim2.new(1, -5, 0, UIListLayout.AbsoluteContentSize.Y + 24)
+						Size = UDim2.new(1, -5, 0, UIListLayout.AbsoluteContentSize.Y + 40)
 					})
 				end;
 			end));
@@ -6058,6 +6102,7 @@ function NeverLose:CreateWindow(Config)
 		ConfigMenu.AnchorPoint = Vector2.new(0.5, 0)
 		ConfigMenu.BackgroundColor3 = NeverLose.PopupSurfaceColor
 		ConfigMenu.BackgroundTransparency = 0.035
+		NeverLose.ApplyPopupSurface(ConfigMenu , 0.035);
 		ConfigMenu.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ConfigMenu.BorderSizePixel = 0
 		ConfigMenu.ClipsDescendants = true
@@ -6105,6 +6150,7 @@ function NeverLose:CreateWindow(Config)
 
 		LineFrame.Name = NeverLose.RandomString();
 		LineFrame.Parent = InputFrame
+		LineFrame.Visible = false
 		LineFrame.AnchorPoint = Vector2.new(0.5, 1)
 		LineFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 		LineFrame.BackgroundTransparency = 0.650
@@ -6239,7 +6285,7 @@ function NeverLose:CreateWindow(Config)
 		ConfigLib.SelectedConfig = "Default";
 
 		local UpdateSize = LPH_NO_VIRTUALIZE(function()
-			local size = TextService:GetTextSize(ConfigName.Text , ConfigName.TextSize,Enum.Font.GothamMedium,Vector2.new(math.huge,math.huge));
+			local size = TextService:GetTextSize(ConfigName.Text , ConfigName.TextSize,NeverLose.TextMetricFont,Vector2.new(math.huge,math.huge));
 
 			NeverLose.PlayAnimate(ConfigFrame,SlowyTween , {
 				Size = UDim2.fromOffset(size.X + 75, 30)
@@ -6918,7 +6964,7 @@ function NeverLose:CreateWindow(Config)
 			Icon.TextWrapped = true
 
 			InnerBlock.Update = LPH_NO_VIRTUALIZE(function(value)
-				local size = TextService:GetTextSize(Content.Text , Content.TextSize,Enum.Font.GothamBold,Vector2.new(math.huge,math.huge))
+				local size = TextService:GetTextSize(Content.Text , Content.TextSize,NeverLose.TextMetricFont,Vector2.new(math.huge,math.huge))
 
 				if InnerBlock.Visible then
 					NeverLose.PlayAnimate(Frame,VSlowTween,{
@@ -7127,8 +7173,8 @@ function NeverLose:CreateNotification()
 		NotifyContent.TextTransparency = 0.650
 		NotifyContent.TextXAlignment = Enum.TextXAlignment.Left
 
-		local Size1 = TextService:GetTextSize(NotifyName.Text,NotifyName.TextSize,Enum.Font.GothamBold,Vector2.new(math.huge,math.huge));
-		local Size2 = TextService:GetTextSize(NotifyContent.Text,NotifyContent.TextSize,Enum.Font.GothamBold,Vector2.new(math.huge,math.huge));
+		local Size1 = TextService:GetTextSize(NotifyName.Text,NotifyName.TextSize,NeverLose.TextMetricFont,Vector2.new(math.huge,math.huge));
+		local Size2 = TextService:GetTextSize(NotifyContent.Text,NotifyContent.TextSize,NeverLose.TextMetricFont,Vector2.new(math.huge,math.huge));
 
 		local MainSize = math.max(Size1.X , Size2.X);
 
@@ -7295,7 +7341,7 @@ function NeverLose:CreateLogger()
 		Icon.TextTransparency = 1--0.250
 		Icon.TextWrapped = true
 
-		local size = TextService:GetTextSize(LogContent.Text,LogContent.TextSize,Enum.Font.GothamBold,Vector2.new(math.huge,math.huge));
+		local size = TextService:GetTextSize(LogContent.Text,LogContent.TextSize,NeverLose.TextMetricFont,Vector2.new(math.huge,math.huge));
 
 		NeverLose.PlayAnimate(LogFrame , SlowyTween , {
 			Size = UDim2.new(0, size.X + 35, 0, 20),
@@ -7480,7 +7526,7 @@ function NeverLose:CreateIndicator()
 		Content.TextXAlignment = Enum.TextXAlignment.Left
 
 		Indicator.Update = LPH_NO_VIRTUALIZE(function()
-			local text = TextService:GetTextSize(Content.Text,Content.TextSize , Enum.Font.GothamBold , Vector2.new(math.huge,math.huge));
+			local text = TextService:GetTextSize(Content.Text,Content.TextSize , NeverLose.TextMetricFont , Vector2.new(math.huge,math.huge));
 
 			NeverLose.PlayAnimate(IndicatorItem , SlowyTween , {
 				Size = UDim2.new(0, text.X + 60, 0, 40);
