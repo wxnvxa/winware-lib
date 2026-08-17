@@ -10,184 +10,18 @@ do
 	getfenv()[Constant] = getfenv()[Constant] or function(f) return f end;
 end;
 
-cloneref = cloneref or function(i) return i end;
-gethui = gethui or get_hidden_gui;
-getcustomasset = getcustomasset or getsynasset;
-getgenv = getgenv or getfenv;
-
-local LOAD_ENV = LPH_NO_VIRTUALIZE(function()
-	if game:GetService('RunService'):IsStudio() then
-		local BaseWorkspace = game:GetService("ReplicatedFirst"):FindFirstChild('PRI_WORKSPACE') or Instance.new('Folder',game:GetService("ReplicatedFirst"));
-
-		BaseWorkspace.Name = 'PRI\0.'..tostring(string.char(math.random(50,120)))..tostring(string.char(math.random(50,120)))..tostring(string.char(math.random(50,120)))..tostring(string.char(math.random(50,120)))..tostring(string.char(math.random(50,120)))..tostring(string.char(math.random(50,120)));
-
-		local __get_path_c = function(path)
-			return (string.find(path,'/',1,true) and string.split(path,'/')) or (string.find(path,'\\',1,true) and string.split(path,'\\')) or {path};
-		end;
-
-		local __get_path = function(path)
-			local main = __get_path_c(path);
-
-			local block = BaseWorkspace;
-
-			for i,v in next , main do
-				block = block[v];
-			end;
-
-			return block;
-		end;
-
-		getgenv().readfile = function(path)
-			local path : StringValue = __get_path(path);
-
-			return path.Value;
-		end;
-
-		getgenv().isfile = function(path)
-			local success , message = pcall(function()
-				return __get_path(path);
-			end);
-
-			if success and not message:IsA("Folder") then
-				return true;
-			end;
-
-			return false;
-		end;
-
-		getgenv().isfolder = function(path)
-			local success , message = pcall(function()
-				return __get_path(path);
-			end);
-
-			if success and message:IsA("Folder") then
-				return true;
-			end;
-
-			return false;
-		end;
-
-		getgenv().writefile = function(path,content)
-			local main = __get_path_c(path);
-
-			local block = BaseWorkspace;
-
-			for i,v in next , main do
-				local item = block:FindFirstChild(v);
-				if not item then
-					local c = Instance.new('StringValue',block);
-
-					c.Name = tostring(v);
-					c.Value = content;
-				else
-					if item:IsA('StringValue') and tostring(item) == v then
-						item.Name = tostring(v);
-						item.Value = content;
-					end;
-
-					block = item;
-				end;
-			end;
-		end;
-
-		getgenv().listfiles = function(path)
-			local fold = __get_path(path);
-			local pa = {};
-
-			for i,v in next , fold:GetChildren() do
-				if v:IsA('StringValue') then
-					table.insert(pa,path..'/'..tostring(v));
-				end;
-			end;
-
-			return pa;
-		end;
-
-		getgenv().makefolder = function(path)
-			local main = __get_path_c(path);
-
-			local block = BaseWorkspace;
-
-			for i,v in next , main do
-				local item = block:FindFirstChild(v);
-				if not item then
-					local c = Instance.new('Folder',block);
-
-					c.Name = tostring(v);
-				else
-					block = item;
-				end;
-			end;
-		end;
-
-		getgenv().delfile = function(path)
-			local main = __get_path_c(path);
-
-			local block = BaseWorkspace;
-
-			for i,v in next , main do
-				local item = block:FindFirstChild(v);
-				if item and item:IsA('StringValue') then
-					item:Destroy();
-				else
-					block = item;
-				end;
-			end;
-		end;
-	end;
-end)
-
-LOAD_ENV();
-
-writefile = writefile or getgenv().writefile;
-makefolder = makefolder or getgenv().makefolder;
-readfile = readfile or getgenv().readfile;
-delfolder = delfolder or getgenv().delfolder;
-delfile = delfile or getgenv().delfile;
-listfiles = listfiles or getgenv().listfiles;
-isfolder = isfolder or getgenv().isfolder;
-isfile = isfile or getgenv().isfile;
-
 local WinWare = {};
 
 WinWare.BuiltInRegular = Font.new('rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json',Enum.FontWeight.Regular,Enum.FontStyle.Normal);
 WinWare.BuiltInBold = Font.new('rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json',Enum.FontWeight.Bold,Enum.FontStyle.Normal);
-local function CreateMontserratFont(weight)
-	local okEnum, enumFont = pcall(function()
-		local font = Font.fromEnum(Enum.Font.Montserrat);
-		font.Weight = weight;
-		font.Style = Enum.FontStyle.Normal;
-		return font;
-	end)
+WinWare.MontserratMedium = Font.new('rbxasset://fonts/families/Montserrat.json',Enum.FontWeight.Medium,Enum.FontStyle.Normal);
+WinWare.MontserratSemiBold = Font.new('rbxasset://fonts/families/Montserrat.json',Enum.FontWeight.SemiBold,Enum.FontStyle.Normal);
+WinWare.MontserratBold = Font.new('rbxasset://fonts/families/Montserrat.json',Enum.FontWeight.Bold,Enum.FontStyle.Normal);
 
-	if okEnum and enumFont then
-		return enumFont;
-	end
-
-	local okAsset, assetFont = pcall(function()
-		return Font.new("rbxasset://fonts/families/Montserrat.json", weight, Enum.FontStyle.Normal)
-	end)
-
-	if okAsset and assetFont then
-		return assetFont;
-	end
-
-	return Font.fromName("Montserrat", weight, Enum.FontStyle.Normal);
-end
-
-WinWare.MontserratMedium = CreateMontserratFont(Enum.FontWeight.Medium);
-WinWare.MontserratSemiBold = CreateMontserratFont(Enum.FontWeight.SemiBold);
-WinWare.MontserratBold = CreateMontserratFont(Enum.FontWeight.Bold);
-
-local okMetricFont, metricFont = pcall(function()
-	return Enum.Font.Montserrat;
-end)
-
-WinWare.TextMetricFont = (okMetricFont and metricFont) or Enum.Font.GothamMedium;
+WinWare.TextMetricFont = Enum.Font.Montserrat;
 WinWare.GlobalSignals = {};
 WinWare.UnloadEnabled = false;
 
-local cloneref: cloneref = cloneref or function(f) return f end;
 local TweenService: TweenService = cloneref(game:GetService('TweenService'));
 local UserInputService: UserInputService = cloneref(game:GetService('UserInputService'));
 local TextService: TextService = cloneref(game:GetService('TextService'));
@@ -195,10 +29,9 @@ local RunService: RunService = cloneref(game:GetService('RunService'));
 local Players: Players = cloneref(game:GetService('Players'));
 local HttpService: HttpService = cloneref(game:GetService('HttpService'));
 local LocalPlayer: Player = Players.LocalPlayer;
-local CoreGui: PlayerGui = (gethui and gethui()) or (get_hidden_gui and get_hidden_gui()) or cloneref(game:FindFirstChild('CoreGui')) or cloneref(LocalPlayer.PlayerGui);
+local CoreGui: PlayerGui = gethui();
 local Mouse: Mouse = LocalPlayer:GetMouse();
 local CurrentCamera: Camera = cloneref(workspace.CurrentCamera);
-local ProtectGui = protect_gui or protectgui or (syn and syn.protect_gui) or function(s) return s; end;
 local GlobalWindow = Instance.new('ScreenGui');
 local ManualTween = TweenInfo.new(0.1);
 local SlowyTween = TweenInfo.new(0.175);
@@ -224,8 +57,6 @@ WinWare.UserProfile = ResolveUserThumbnail(LocalPlayer)
 WinWare.RandomString = LPH_NO_VIRTUALIZE(function()
 	return string.rep(string.char(math.random(1,7)),math.random(1,4))..string.rep(string.char(math.random(1,7)),math.random(1,4))..string.rep(string.char(math.random(1,7)),math.random(1,4))..string.rep(string.char(math.random(1,7)),math.random(1,4))..string.rep(string.char(math.random(1,7)),math.random(1,4))..string.rep(string.char(math.random(1,7)),math.random(1,4))..string.rep(string.char(math.random(1,7)),math.random(1,4))..string.rep(string.char(math.random(1,7)),math.random(1,4))..string.rep(string.char(math.random(1,7)),math.random(1,4))..string.rep(string.char(math.random(1,7)),math.random(1,4))..string.rep(string.char(math.random(1,7)),math.random(1,4));
 end);
-
-ProtectGui(GlobalWindow);
 
 local PreviousWinWareGui = CoreGui:FindFirstChild("WinWareUI");
 if PreviousWinWareGui then
@@ -257,12 +88,10 @@ WinWare.PopupStrokeTransparency = 0.93;
 WinWare.RegisiteryColor = {};
 WinWare.NameRegisitry = {};
 WinWare.IsMosueOverOtherFrame = false;
--- WinWare owns the product mark.  Keep a neutral fallback until the executor
--- loads the exact PNG from the public repository below.
 WinWare.GlobalLogo = "rbxassetid://0";
 WinWare.ImageColorMapping = "rbxassetid://4155801252";
 
-if getcustomasset then
+do
 	local winwareLink = "https://raw.githubusercontent.com/wxnvxa/winware-lib/main/assets/%s";
 	local dir = 'WinWareAssets';
 
@@ -270,31 +99,32 @@ if getcustomasset then
 		makefolder(dir);
 	end;
 
-	pcall(function()
-		if not isfile(dir..'/winware.png') then
-			local byte = game:HttpGet(string.format(winwareLink,'winware.png'));
+	local LoadAsset = LPH_NO_VIRTUALIZE(function(name)
+		local path = dir..'/'..name;
 
-			writefile(dir..'/winware.png' , byte);
+		if not isfile(path) then
+			local response = request({
+				Url = string.format(winwareLink , name),
+				Method = 'GET'
+			});
+
+			writefile(path , response.Body);
 			task.wait();
 		end;
 
-		if isfile(dir..'/winware.png') then
-			WinWare.GlobalLogo = getcustomasset(dir..'/winware.png')
-		end;
+		return getcustomasset(path);
 	end);
 
-	pcall(function()
-		if not isfile(dir..'/'..'saturation_value_gradient.png') then
-			local byte = game:HttpGet(string.format(winwareLink,'saturation_value_gradient.png'));
+	local okLogo , logo = pcall(LoadAsset , 'winware.png');
+	local okMapping , mapping = pcall(LoadAsset , 'saturation_value_gradient.png');
 
-			writefile(dir..'/'..'saturation_value_gradient.png' , byte);
-			task.wait();
-		end;
+	if okLogo then
+		WinWare.GlobalLogo = logo;
+	end;
 
-		if isfile(dir..'/'..'saturation_value_gradient.png') then
-			WinWare.ImageColorMapping = getcustomasset(dir..'/'..'saturation_value_gradient.png')
-		end;
-	end);
+	if okMapping then
+		WinWare.ImageColorMapping = mapping;
+	end;
 end;
 
 function WinWare:AddSignal(RBXSignal)
