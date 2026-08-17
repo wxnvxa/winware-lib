@@ -3899,8 +3899,7 @@ function NeverLose:CreateWindow(Config)
 	local LineFrame_2 = Instance.new("Frame")
 	local UserSettingButton = Instance.new("TextLabel")
 	local RightMenuFrame = Instance.new("Frame")
-	local UIStroke = Instance.new("UIStroke")
-	local UICorner_4 = Instance.new("UICorner")
+	local VerticalDivider = Instance.new("Frame")
 	local RightHeader = Instance.new("Frame")
 	local LineFrame_3 = Instance.new("Frame")
 	local ConfigFrame = Instance.new("Frame")
@@ -4003,8 +4002,8 @@ function NeverLose:CreateWindow(Config)
 				BackgroundTransparency = 1
 			})
 
-			NeverLose.PlayAnimate(UIStroke , SlowyTween , {
-				Transparency = 0.950
+			NeverLose.PlayAnimate(VerticalDivider , SlowyTween , {
+				BackgroundTransparency = 0.950
 			})
 
 			NeverLose.PlayAnimate(LineFrame_3 , SlowyTween , {
@@ -4091,8 +4090,8 @@ function NeverLose:CreateWindow(Config)
 				BackgroundTransparency = 1
 			})
 
-			NeverLose.PlayAnimate(UIStroke , SlowyTween , {
-				Transparency = 1
+			NeverLose.PlayAnimate(VerticalDivider , SlowyTween , {
+				BackgroundTransparency = 1
 			})
 
 			NeverLose.PlayAnimate(LineFrame_3 , SlowyTween , {
@@ -4385,12 +4384,15 @@ function NeverLose:CreateWindow(Config)
 	RightMenuFrame.Size = UDim2.new(1, -167, 1, 0)
 	RightMenuFrame.ZIndex = 8
 
-	UIStroke.Transparency = 0.950
-	UIStroke.Color = Color3.fromRGB(255, 255, 255)
-	UIStroke.Parent = RightMenuFrame
-
-	UICorner_4.CornerRadius = UDim.new(0, 13)
-	UICorner_4.Parent = RightMenuFrame
+	VerticalDivider.Name = NeverLose.RandomString()
+	VerticalDivider.Parent = RightMenuFrame
+	VerticalDivider.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	VerticalDivider.BackgroundTransparency = 0.950
+	VerticalDivider.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	VerticalDivider.BorderSizePixel = 0
+	VerticalDivider.Position = UDim2.fromOffset(0, 0)
+	VerticalDivider.Size = UDim2.new(0, 1, 1, 0)
+	VerticalDivider.ZIndex = 9
 
 	RightHeader.Name = NeverLose.RandomString();
 	RightHeader.Parent = RightMenuFrame
