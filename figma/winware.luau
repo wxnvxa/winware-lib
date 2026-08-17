@@ -1366,6 +1366,204 @@ function NeverLose:CreateOptionWindow(Frame: Frame , Zindex)
 	return Payback;
 end;
 
+function NeverLose:CreateModuleOptionWindow(Trigger: Frame, Zindex, Config)
+	Config = NeverLose:ProcessParams(Config, {
+		Name = "Module",
+		Width = 320,
+		Height = 420,
+	});
+
+	local Window = {
+		Signal = NeverLose:CreateSignal(false),
+	};
+
+	local Root = Instance.new("Frame")
+	local RootCorner = Instance.new("UICorner")
+	local RootStroke = Instance.new("UIStroke")
+	local Header = Instance.new("Frame")
+	local Grip = Instance.new("TextLabel")
+	local Title = Instance.new("TextLabel")
+	local Close = Instance.new("TextLabel")
+	local Divider = Instance.new("Frame")
+	local Content = Instance.new("ScrollingFrame")
+	local ContentLayout = Instance.new("UIListLayout")
+	local ContentPadding = Instance.new("UIPadding")
+	local Shadow = NeverLose:CreateShadow(Root)
+
+	Root.Name = NeverLose.RandomString()
+	Root.AnchorPoint = Vector2.new(0.5, 0.5)
+	Root.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
+	Root.BackgroundTransparency = 0.02
+	Root.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Root.BorderSizePixel = 0
+	Root.ClipsDescendants = true
+	Root.Position = UDim2.fromScale(0.5, 0.5)
+	Root.Size = UDim2.fromOffset(Config.Width, Config.Height)
+	Root.Visible = false
+	Root.ZIndex = Zindex + 100
+
+	RootCorner.CornerRadius = UDim.new(0, 14)
+	RootCorner.Parent = Root
+
+	RootStroke.Color = Color3.fromRGB(255, 255, 255)
+	RootStroke.Thickness = 1
+	RootStroke.Transparency = 0.93
+	RootStroke.Parent = Root
+
+	Header.Name = NeverLose.RandomString()
+	Header.Parent = Root
+	Header.BackgroundTransparency = 1
+	Header.BorderSizePixel = 0
+	Header.Size = UDim2.new(1, 0, 0, 54)
+	Header.ZIndex = Root.ZIndex + 1
+
+	Grip.Name = NeverLose.RandomString()
+	Grip.Parent = Header
+	Grip.AnchorPoint = Vector2.new(0, 0.5)
+	Grip.BackgroundTransparency = 1
+	Grip.Position = UDim2.new(0, 12, 0.5, 0)
+	Grip.Size = UDim2.fromOffset(22, 22)
+	Grip.ZIndex = Header.ZIndex + 1
+	Grip.FontFace = NeverLose.BuiltInBold
+	Grip.Text = "six-dots-two-column-grid"
+	Grip.TextColor3 = Color3.fromRGB(145, 145, 145)
+	Grip.TextSize = 14
+
+	Title.Name = NeverLose.RandomString()
+	Title.Parent = Header
+	Title.AnchorPoint = Vector2.new(0, 0.5)
+	Title.BackgroundTransparency = 1
+	Title.Position = UDim2.new(0, 42, 0.5, 0)
+	Title.Size = UDim2.new(1, -86, 0, 24)
+	Title.ZIndex = Header.ZIndex + 1
+	Title.FontFace = NeverLose.MontserratSemiBold
+	Title.Text = Config.Name
+	Title.TextColor3 = Color3.fromRGB(219, 219, 219)
+	Title.TextSize = 14
+	Title.TextXAlignment = Enum.TextXAlignment.Left
+
+	Close.Name = NeverLose.RandomString()
+	Close.Parent = Header
+	Close.AnchorPoint = Vector2.new(1, 0.5)
+	Close.BackgroundTransparency = 1
+	Close.Position = UDim2.new(1, -13, 0.5, 0)
+	Close.Size = UDim2.fromOffset(24, 24)
+	Close.ZIndex = Header.ZIndex + 2
+	Close.FontFace = NeverLose.BuiltInRegular
+	Close.Text = "x"
+	Close.TextColor3 = Color3.fromRGB(145, 145, 145)
+	Close.TextSize = 16
+
+	Divider.Name = NeverLose.RandomString()
+	Divider.Parent = Root
+	Divider.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Divider.BackgroundTransparency = 0.95
+	Divider.BorderSizePixel = 0
+	Divider.Position = UDim2.fromOffset(0, 54)
+	Divider.Size = UDim2.new(1, 0, 0, 1)
+	Divider.ZIndex = Root.ZIndex + 1
+
+	Content.Name = NeverLose.RandomString()
+	Content.Parent = Root
+	Content.Active = true
+	Content.BackgroundTransparency = 1
+	Content.BorderSizePixel = 0
+	Content.Position = UDim2.fromOffset(0, 55)
+	Content.Size = UDim2.new(1, 0, 1, -55)
+	Content.CanvasSize = UDim2.fromOffset(0, 0)
+	Content.ScrollBarThickness = 2
+	Content.ScrollBarImageColor3 = Color3.fromRGB(76, 76, 76)
+	Content.ZIndex = Root.ZIndex + 1
+
+	ContentPadding.PaddingTop = UDim.new(0, 4)
+	ContentPadding.PaddingBottom = UDim.new(0, 8)
+	ContentPadding.PaddingLeft = UDim.new(0, 8)
+	ContentPadding.PaddingRight = UDim.new(0, 8)
+	ContentPadding.Parent = Content
+
+	ContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	ContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	ContentLayout.Parent = Content
+
+	NeverLose:AddSignal(ContentLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+		Content.CanvasSize = UDim2.fromOffset(0, ContentLayout.AbsoluteContentSize.Y + 12)
+	end))
+
+	NeverLose.Drag(Header, Root, 0.15)
+	NeverLose:CreateInput(Close, function()
+		Window.Signal:SetValue(false)
+	end)
+
+	Window.SetRender = LPH_NO_VIRTUALIZE(function(value)
+		if value then
+			Root.Parent = NeverLose.Global3DRenderMode and NeverLose.GlobalSurfaceGui or NeverLose.ScreenGui
+			Root.Visible = true
+			Root.Size = UDim2.fromOffset(Config.Width - 8, Config.Height - 8)
+			NeverLose.PlayAnimate(Root, SlowyTween, {
+				BackgroundTransparency = 0.02,
+				Size = UDim2.fromOffset(Config.Width, Config.Height),
+			})
+			NeverLose.PlayAnimate(RootStroke, SlowyTween, { Transparency = 0.93 })
+			Shadow:Render(true)
+		else
+			NeverLose.PlayAnimate(Root, SlowyTween, {
+				BackgroundTransparency = 1,
+				Size = UDim2.fromOffset(Config.Width - 8, Config.Height - 8),
+			})
+			NeverLose.PlayAnimate(RootStroke, SlowyTween, { Transparency = 1 })
+			Shadow:Render(false)
+			task.delay(0.18, function()
+				if not Window.Signal:GetValue() then
+					Root.Visible = false
+					Root.Parent = nil
+				end
+			end)
+		end
+	end)
+
+	Window.Signal:Connect(Window.SetRender)
+	Window.SetRender(false)
+
+	local Controls = NeverLose:RegisiterItem(Content, Window.Signal)
+	Controls.Winbdow = Window
+	Controls.Root = Root
+	Controls.Signal = Window.Signal
+
+	function Controls:SetTitle(name)
+		Title.Text = tostring(name or "Module")
+	end
+
+	function Controls:AddSlider(Config)
+		Config = Config or {}
+		local Row = Controls:AddLabel(Config.Name or "Slider")
+		return Row:AddSlider({
+			Default = Config.Default,
+			Min = Config.Min,
+			Max = Config.Max,
+			Type = Config.Type,
+			Rounding = Config.Rounding,
+			Nums = Config.Nums,
+			Flag = Config.Flag,
+			Callback = Config.Callback,
+			Size = Config.Size or 160,
+			Compact = true,
+		})
+	end
+
+	function Controls:AddToggle(Config)
+		Config = Config or {}
+		local Row = Controls:AddLabel(Config.Name or "Toggle")
+		return Row:AddToggle({
+			Default = Config.Default,
+			Flag = Config.Flag,
+			Callback = Config.Callback,
+			Compact = true,
+		})
+	end
+
+	return Controls
+end
+
 function NeverLose:CreateColorPicker(HandleFrame: Frame)
 	local ZIndex = HandleFrame.ZIndex;
 
@@ -1739,7 +1937,13 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 			Default = false,
 			Flag = nil,
 			Callback = EmptyFunction,
+			Compact = false,
 		});
+		local toggleWidth = Config.Compact and 30 or 50
+		local toggleHeight = Config.Compact and 16 or 30
+		local circleSize = Config.Compact and 12 or 23
+		local circleOffPosition = Config.Compact and 8 or 15
+		local circleOnPosition = Config.Compact and 22 or 35
 
 		local Toggle = Instance.new("Frame")
 		local UICorner = Instance.new("UICorner")
@@ -1752,7 +1956,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		Toggle.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Toggle.BorderSizePixel = 0
 		Toggle.ClipsDescendants = true
-		Toggle.Size = UDim2.new(0, 50, 0, 30)
+		Toggle.Size = UDim2.fromOffset(toggleWidth, toggleHeight)
 		Toggle.ZIndex = ZINdex + 13
 		Toggle.LayoutOrder = -(#Handler:GetChildren() + 5);
 
@@ -1766,8 +1970,8 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		Circle.BackgroundTransparency = 0
 		Circle.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Circle.BorderSizePixel = 0
-		Circle.Position = UDim2.new(0, 15, 0.5, 0)
-		Circle.Size = UDim2.new(0, 23, 0, 23)
+		Circle.Position = UDim2.new(0, circleOffPosition, 0.5, 0)
+		Circle.Size = UDim2.fromOffset(circleSize, circleSize)
 		Circle.ZIndex = ZINdex + 14
 
 		UICorner_2.CornerRadius = UDim.new(1, 0)
@@ -1787,7 +1991,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 				NeverLose.PlayAnimate(Circle,SlowyTween,{
 					BackgroundColor3 = Color3.fromRGB(243, 242, 242),
 					BackgroundTransparency = 0,
-					Position = UDim2.new(0, 35, 0.5, 0)
+					Position = UDim2.new(0, circleOnPosition, 0.5, 0)
 				})
 			else
 				NeverLose.PlayAnimate(Toggle,SlowyTween,{
@@ -1798,7 +2002,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 				NeverLose.PlayAnimate(Circle,SlowyTween,{
 					BackgroundColor3 = Color3.fromRGB(77, 77, 77),
 					BackgroundTransparency = 0,
-					Position = UDim2.new(0, 15, 0.5, 0)
+					Position = UDim2.new(0, circleOffPosition, 0.5, 0)
 				})
 			end;
 		end);
@@ -1815,7 +2019,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 				NeverLose.PlayAnimate(Circle,SlowyTween,{
 					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 15, 0.5, 0)
+					Position = UDim2.new(0, circleOffPosition, 0.5, 0)
 				})
 			end;
 		end);
@@ -1865,6 +2069,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 			Flag = nil,
 			Size = 233,
 			Callback = EmptyFunction,
+			Compact = false,
 		});
 
 		local SliderLib = {};
@@ -1872,11 +2077,17 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		SliderLib.GetSize = LPH_NO_VIRTUALIZE(function()
 			return (Config.Default - Config.Min) / (Config.Max - Config.Min);
 		end);
+		SliderLib.GetFillSize = LPH_NO_VIRTUALIZE(function(scale)
+			if Config.Compact then
+				return UDim2.new(scale, 0, 1, 0)
+			end
+			return UDim2.new(scale, 0, 1, -6)
+		end)
 
 		local FullNumSize = TextService:GetTextSize(string.rep("0",(Config.Rounding + #tostring(Config.Max))+1)..tostring(Config.Type),10,Enum.Font.GothamMedium,Vector2.new(math.huge,math.huge));
 
 		SliderLib.MaximumSize = FullNumSize.X;
-		SliderLib.MaximumSize = 45;
+		SliderLib.MaximumSize = Config.Compact and 40 or 45;
 
 		if Config.Nums then
 			local nszie = 0;
@@ -1972,27 +2183,27 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		SlideFrame.Name = NeverLose.RandomString();
 		SlideFrame.Parent = SlideMain
 		SlideFrame.AnchorPoint = Vector2.new(0, 0.5)
-		SlideFrame.BackgroundColor3 = Color3.fromRGB(11, 11, 11)
+		SlideFrame.BackgroundColor3 = Config.Compact and Color3.fromRGB(22, 24, 25) or Color3.fromRGB(11, 11, 11)
 		SlideFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		SlideFrame.BorderSizePixel = 0
-		SlideFrame.ClipsDescendants = true
+		SlideFrame.ClipsDescendants = not Config.Compact
 		SlideFrame.Position = UDim2.new(0, 0, 0.5, 0)
-		SlideFrame.Size = UDim2.new(1, 0, 0, 30)
+		SlideFrame.Size = UDim2.new(1, 0, 0, Config.Compact and 4 or 30)
 		SlideFrame.ZIndex = ZINdex + 13
 
-		UICorner_3.CornerRadius = UDim.new(0, 9)
+		UICorner_3.CornerRadius = UDim.new(0, Config.Compact and 2 or 9)
 		UICorner_3.Parent = SlideFrame
 
 		SlideMoving.Name = NeverLose.RandomString();
 		SlideMoving.Parent = SlideFrame
-		SlideMoving.BackgroundColor3 = NeverLose.AccentColor
+		SlideMoving.BackgroundColor3 = Config.Compact and Color3.fromRGB(140, 180, 255) or NeverLose.AccentColor
 		SlideMoving.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		SlideMoving.BorderSizePixel = 0
-		SlideMoving.Position = UDim2.fromOffset(3, 3)
-		SlideMoving.Size = UDim2.new(SliderLib.GetSize(), 0, 1, -6)
+		SlideMoving.Position = Config.Compact and UDim2.fromOffset(0, 0) or UDim2.fromOffset(3, 3)
+		SlideMoving.Size = SliderLib.GetFillSize(SliderLib.GetSize())
 		SlideMoving.ZIndex = ZINdex + 14
 
-		UICorner_4.CornerRadius = UDim.new(0, 7)
+		UICorner_4.CornerRadius = UDim.new(0, Config.Compact and 2 or 7)
 		UICorner_4.Parent = SlideMoving
 
 		Frame.Parent = SlideMoving
@@ -2001,10 +2212,10 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Frame.BorderSizePixel = 0
 		Frame.Position = UDim2.new(1, 0, 0.5, 0)
-		Frame.Size = UDim2.new(0, 24, 0, 24)
+		Frame.Size = UDim2.fromOffset(Config.Compact and 12 or 24, Config.Compact and 12 or 24)
 		Frame.ZIndex = ZINdex + 15
 
-		UICorner_5.CornerRadius = UDim.new(0, 7)
+		UICorner_5.CornerRadius = UDim.new(0, Config.Compact and 6 or 7)
 		UICorner_5.Parent = Frame
 
 		local LoadText = LPH_NO_VIRTUALIZE(function()
@@ -2027,7 +2238,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 					Config.Default = Value;
 
 					TweenService:Create(SlideMoving , ManualTween ,{
-						Size = UDim2.new(SliderLib.GetSize(), 0, 1, -6)
+						Size = SliderLib.GetFillSize(SliderLib.GetSize())
 					}):Play();
 
 					LoadText();
@@ -2063,7 +2274,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 
 				NeverLose.PlayAnimate(SlideMoving,SlowyTween,{
 					BackgroundTransparency = 0,
-					Size = UDim2.new(SliderLib.GetSize(), 0, 1, -6)
+					Size = SliderLib.GetFillSize(SliderLib.GetSize())
 				});
 
 				NeverLose.PlayAnimate(Frame,SlowyTween,{
@@ -2088,7 +2299,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 
 				NeverLose.PlayAnimate(SlideMoving,SlowyTween,{
 					BackgroundTransparency = 1,
-					Size = UDim2.new(0, 0, 1, -6)
+					Size = SliderLib.GetFillSize(0)
 				});
 
 				NeverLose.PlayAnimate(Frame,SlowyTween,{
@@ -2110,7 +2321,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 			Config.Default = Value;
 
 			TweenService:Create(SlideMoving , ManualTween ,{
-				Size = UDim2.new(SliderLib.GetSize(), 0, 1, -6)
+				Size = SliderLib.GetFillSize(SliderLib.GetSize())
 			}):Play();
 
 			LoadText()
@@ -2168,7 +2379,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 			if Signal:GetValue() then
 				NeverLose.PlayAnimate(SlideMoving,SlowyTween,{
 					BackgroundTransparency = 0,
-					Size = UDim2.new(SliderLib.GetSize(), 0, 1, -6)
+					Size = SliderLib.GetFillSize(SliderLib.GetSize())
 				});
 			end;
 
@@ -2184,7 +2395,14 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		return SliderLib;
 	end;
 
-	function handle:AddOption(GearIcon)
+	function handle:AddOption(OptionConfig)
+		local GearIcon = typeof(OptionConfig) == "number" and OptionConfig or nil
+		local ModuleConfig = nil
+		if typeof(OptionConfig) == "string" then
+			ModuleConfig = { Name = OptionConfig }
+		elseif typeof(OptionConfig) == "table" then
+			ModuleConfig = OptionConfig
+		end
 		local Option = Instance.new("Frame")
 		local Icon = Instance.new("TextLabel")
 		local UICorner = Instance.new("UICorner")
@@ -2220,7 +2438,9 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		UICorner.CornerRadius = UDim.new(0, 4)
 		UICorner.Parent = Option
 
-		local Window = NeverLose:CreateOptionWindow(Option , ZINdex + 13);
+		local Window = ModuleConfig
+			and NeverLose:CreateModuleOptionWindow(Option, ZINdex + 13, ModuleConfig)
+			or NeverLose:CreateOptionWindow(Option, ZINdex + 13)
 		local reciveSignal;
 
 		Window.SetRender = LPH_NO_VIRTUALIZE(function(value)
@@ -2238,13 +2458,16 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		Window.SetRender(Signal:GetValue());
 		Signal:Connect(Window.SetRender);
 
-		local bthg = NeverLose:CreateInput(Option , LPH_NO_VIRTUALIZE(function()
+		NeverLose:CreateInput(Option , LPH_NO_VIRTUALIZE(function()
 			if reciveSignal then
 				reciveSignal:Disconnect();
 				reciveSignal = nil;	
 			end;
 
-			Window.Signal:SetValue(true);
+			Window.Signal:SetValue(not Window.Signal:GetValue());
+			if not Window.Signal:GetValue() then
+				return
+			end
 
 			reciveSignal = UserInputService.InputBegan:Connect(function(Input)
 				if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
@@ -2259,26 +2482,6 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 				end
 			end)
 		end));
-
-		NeverLose:AddSignal(bthg.MouseEnter:Connect(LPH_NO_VIRTUALIZE(function()
-			NeverLose.PlayAnimate(Option , SlowyTween , {
-				BackgroundTransparency = 0.5
-			})
-
-			NeverLose.PlayAnimate(Icon , SlowyTween , {
-				TextTransparency = 0
-			})
-		end)));
-
-		NeverLose:AddSignal(bthg.MouseLeave:Connect(LPH_NO_VIRTUALIZE(function()
-			NeverLose.PlayAnimate(Option , SlowyTween , {
-				BackgroundTransparency = 1.000
-			})
-
-			NeverLose.PlayAnimate(Icon , SlowyTween , {
-				TextTransparency = 0
-			})
-		end)));
 
 		return Window;
 	end;
@@ -3526,27 +3729,6 @@ function NeverLose:RegisiterItem(Frame: Frame , Signel)
 		function handle:SetVisible(val)
 			BasedFrame.Visible = val;
 		end;
-
-		NeverLose:AddSignal(BasedFrame.MouseEnter:Connect(LPH_NO_VIRTUALIZE(function()
-			NeverLose.PlayAnimate(BasedFrame , SlowyTween , {
-				BackgroundTransparency = 0.35
-			});
-
-			NeverLose.PlayAnimate(BasedLabel , SlowyTween , {
-				TextTransparency = 0
-			})
-
-		end)))
-
-		NeverLose:AddSignal(BasedFrame.MouseLeave:Connect(LPH_NO_VIRTUALIZE(function()
-			NeverLose.PlayAnimate(BasedFrame , SlowyTween , {
-				BackgroundTransparency = 1
-			});
-
-			NeverLose.PlayAnimate(BasedLabel , SlowyTween , {
-				TextTransparency = 0
-			})
-		end)))
 
 		function handle:SetText(t)
 			local oldtxt = BasedLabel.Text;
@@ -4946,7 +5128,7 @@ function NeverLose:CreateWindow(Config)
 			Tab.SetValue(false);
 		end;
 
-		local over = NeverLose:CreateInput(TabButton,LPH_NO_VIRTUALIZE(function()
+		NeverLose:CreateInput(TabButton,LPH_NO_VIRTUALIZE(function()
 			for i,v in next , Window.Tabs do
 				if v.Idx == TabButton then
 					v.SetValue(true);
@@ -4956,30 +5138,6 @@ function NeverLose:CreateWindow(Config)
 				end;
 			end;
 		end));
-
-		NeverLose:AddSignal(over.MouseEnter:Connect(LPH_NO_VIRTUALIZE(function()
-			if Window.Tabs[Window.CurrentTab] == Tab then
-				NeverLose.PlayAnimate(TabButton , SlowyTween , {
-					BackgroundTransparency = 0.900
-				})
-			else
-				NeverLose.PlayAnimate(TabButton , SlowyTween , {
-					BackgroundTransparency = 0.940
-				})
-			end;
-		end)))
-
-		NeverLose:AddSignal(over.MouseLeave:Connect(LPH_NO_VIRTUALIZE(function()
-			if Window.Tabs[Window.CurrentTab] == Tab then
-				NeverLose.PlayAnimate(TabButton , SlowyTween , {
-					BackgroundTransparency = 0.900
-				})
-			else
-				NeverLose.PlayAnimate(TabButton , SlowyTween , {
-					BackgroundTransparency = 1
-				})
-			end;
-		end)))
 
 		Window.Signal:Connect(LPH_NO_VIRTUALIZE(function(value)
 			if value then
