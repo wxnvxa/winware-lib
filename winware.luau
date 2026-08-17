@@ -80,25 +80,6 @@ WinWare.Scales = {
 
 WinWare.IconColor = Color3.fromRGB(255, 255, 255);
 WinWare.ScreenGui = GlobalWindow;
-WinWare.CoreBlurEnabled = true;
-WinWare.CoreBlurActive = false;
-
-WinWare.SetCoreBlur = LPH_NO_VIRTUALIZE(function(State)
-	State = State and WinWare.CoreBlurEnabled or false;
-
-	if WinWare.CoreBlurActive == State then
-		return;
-	end;
-
-	WinWare.CoreBlurActive = State;
-
-	local Identity = getthreadidentity();
-
-	setthreadidentity(8);
-	RunService:SetRobloxGuiFocused(State);
-	setthreadidentity(Identity);
-end);
-
 WinWare.Flags = {};
 WinWare.AccentColor = Color3.fromRGB(0, 86, 255);
 WinWare.MainColor = Color3.fromRGB(11, 11, 11);
@@ -4686,8 +4667,6 @@ function WinWare:CreateWindow(Config)
 
 	local renderParentWindow = LPH_NO_VIRTUALIZE(function()
 		if Window.__3DRender then
-			WinWare.SetCoreBlur(false);
-
 			if WindowFrame.BackgroundTransparency > 0.9 then
 				WindowFrame.Visible = false;
 				WindowFrame.Parent = nil
@@ -4702,13 +4681,9 @@ function WinWare:CreateWindow(Config)
 			end;
 		else
 			if WindowFrame.BackgroundTransparency > 0.9 then
-				WinWare.SetCoreBlur(false);
-
 				WindowFrame.Visible = false;
 				WindowFrame.Parent = nil
 			else
-				WinWare.SetCoreBlur(true);
-
 				WindowFrame.Visible = true;
 				WindowFrame.Parent = WinWare.ScreenGui
 
@@ -7549,7 +7524,6 @@ function WinWare:Unload()
 		return;	
 	end;
 
-	WinWare.SetCoreBlur(false);
 	WinWare.ScreenGui:Destroy();
 
 	for i,v in next , WinWare.GlobalSignals do
