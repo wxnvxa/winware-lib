@@ -1707,7 +1707,7 @@ function NeverLose:CreateColorPicker(HandleFrame: Frame)
 	RGBLabel.Position = UDim2.new(0, 10, 0, 217)
 	RGBLabel.Size = UDim2.new(1, -20, 0, 15)
 	RGBLabel.ZIndex = ZIndex + 127
-	RGBLabel.Font = Enum.Font.GothamBold
+	RGBLabel.FontFace = NeverLose.MontserratBold
 	RGBLabel.Text = "#FFFFFF"
 	RGBLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 	RGBLabel.TextSize = 12.000
@@ -2083,20 +2083,38 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 			Callback = EmptyFunction,
 			Compact = false,
 		});
+		Config.Min = tonumber(Config.Min) or 0
+		Config.Max = tonumber(Config.Max) or Config.Min
+		if Config.Max < Config.Min then
+			Config.Min, Config.Max = Config.Max, Config.Min
+		end
+		Config.Default = NeverLose.Rounding(
+			math.clamp(tonumber(Config.Default) or Config.Min, Config.Min, Config.Max),
+			Config.Rounding
+		)
 
 		local SliderLib = {};
+		local thumbSize = Config.Compact and 12 or 24
+		local thumbRadius = thumbSize / 2
+		local trackInset = Config.Compact and 0 or 3
 
 		SliderLib.GetSize = LPH_NO_VIRTUALIZE(function()
-			return (Config.Default - Config.Min) / (Config.Max - Config.Min);
+			local range = Config.Max - Config.Min
+			if range == 0 then
+				return 0
+			end
+
+			return math.clamp((Config.Default - Config.Min) / range, 0, 1);
 		end);
 		SliderLib.GetFillSize = LPH_NO_VIRTUALIZE(function(scale)
-			if Config.Compact then
-				return UDim2.new(scale, 0, 1, 0)
-			end
-			return UDim2.new(scale, 0, 1, -6)
+			local offset = thumbRadius - trackInset - (thumbSize * scale)
+			return UDim2.new(scale, offset, 1, -(trackInset * 2))
+		end)
+		SliderLib.GetThumbPosition = LPH_NO_VIRTUALIZE(function(scale)
+			return UDim2.new(scale, thumbRadius - (thumbSize * scale), 0.5, 0)
 		end)
 
-		local FullNumSize = TextService:GetTextSize(string.rep("0",(Config.Rounding + #tostring(Config.Max))+1)..tostring(Config.Type),10,Enum.Font.GothamMedium,Vector2.new(math.huge,math.huge));
+		local FullNumSize = TextService:GetTextSize(string.rep("0",(Config.Rounding + #tostring(Config.Max))+1)..tostring(Config.Type),10,Enum.Font.MontserratMedium,Vector2.new(math.huge,math.huge));
 
 		SliderLib.MaximumSize = FullNumSize.X;
 		SliderLib.MaximumSize = Config.Compact and 40 or 45;
@@ -2105,7 +2123,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 			local nszie = 0;
 
 			for i,ns in next , Config.Nums do
-				local size = TextService:GetTextSize(string.rep("m",string.len(tostring(ns))),10,Enum.Font.GothamMedium,Vector2.new(math.huge,math.huge));
+				local size = TextService:GetTextSize(string.rep("m",string.len(tostring(ns))),10,Enum.Font.MontserratMedium,Vector2.new(math.huge,math.huge));
 
 				if nszie < size.X then
 					nszie = size.X;
@@ -2218,13 +2236,13 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		UICorner_4.CornerRadius = UDim.new(0, Config.Compact and 2 or 7)
 		UICorner_4.Parent = SlideMoving
 
-		Frame.Parent = SlideMoving
-		Frame.AnchorPoint = Vector2.new(1, 0.5)
+		Frame.Parent = SlideFrame
+		Frame.AnchorPoint = Vector2.new(0.5, 0.5)
 		Frame.BackgroundColor3 = Color3.fromRGB(243, 242, 242)
 		Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Frame.BorderSizePixel = 0
-		Frame.Position = UDim2.new(1, 0, 0.5, 0)
-		Frame.Size = UDim2.fromOffset(Config.Compact and 12 or 24, Config.Compact and 12 or 24)
+		Frame.Position = SliderLib.GetThumbPosition(SliderLib.GetSize())
+		Frame.Size = UDim2.fromOffset(thumbSize, thumbSize)
 		Frame.ZIndex = ZINdex + 15
 
 		UICorner_5.CornerRadius = UDim.new(0, Config.Compact and 6 or 7)
@@ -2251,6 +2269,9 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 
 					TweenService:Create(SlideMoving , ManualTween ,{
 						Size = SliderLib.GetFillSize(SliderLib.GetSize())
+					}):Play();
+					TweenService:Create(Frame, ManualTween, {
+						Position = SliderLib.GetThumbPosition(SliderLib.GetSize())
 					}):Play();
 
 					LoadText();
@@ -2290,7 +2311,8 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 				});
 
 				NeverLose.PlayAnimate(Frame,SlowyTween,{
-					BackgroundTransparency = 0
+					BackgroundTransparency = 0,
+					Position = SliderLib.GetThumbPosition(SliderLib.GetSize())
 				});
 			else
 				NeverLose.PlayAnimate(ValueFrame,SlowyTween,{
@@ -2324,16 +2346,19 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		SliderLib.Signal = Signal:Connect(SliderLib.SetRender);
 
 		local Update = function(Input)
-			local SizeScale = math.clamp((((Input.Position.X) - SlideMain.AbsolutePosition.X) / SlideMain.AbsoluteSize.X), 0, 1);
+			local travelWidth = math.max(SlideFrame.AbsoluteSize.X - thumbSize, 1)
+			local pointerX = Input.Position.X - SlideFrame.AbsolutePosition.X - thumbRadius
+			local SizeScale = math.clamp(pointerX / travelWidth, 0, 1);
 			local Main = ((Config.Max - Config.Min) * SizeScale) + Config.Min;
 			local Value = NeverLose.Rounding(Main,Config.Rounding);
-			local PositionX = UDim2.fromScale(SizeScale, 1);
-			local Size = ((Value - Config.Min) / (Config.Max - Config.Min)) + 0.02;
 
 			Config.Default = Value;
 
 			TweenService:Create(SlideMoving , ManualTween ,{
 				Size = SliderLib.GetFillSize(SliderLib.GetSize())
+			}):Play();
+			TweenService:Create(Frame, ManualTween, {
+				Position = SliderLib.GetThumbPosition(SliderLib.GetSize())
 			}):Play();
 
 			LoadText()
@@ -2386,12 +2411,21 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		end;
 
 		function SliderLib:SetValue(v)
-			Config.Default = v;
+			local numberValue = tonumber(v)
+			if not numberValue then
+				return
+			end
+
+			Config.Default = NeverLose.Rounding(math.clamp(numberValue, Config.Min, Config.Max), Config.Rounding);
 
 			if Signal:GetValue() then
 				NeverLose.PlayAnimate(SlideMoving,SlowyTween,{
 					BackgroundTransparency = 0,
 					Size = SliderLib.GetFillSize(SliderLib.GetSize())
+				});
+				NeverLose.PlayAnimate(Frame, SlowyTween, {
+					BackgroundTransparency = 0,
+					Position = SliderLib.GetThumbPosition(SliderLib.GetSize())
 				});
 			end;
 
@@ -2669,7 +2703,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		ValueLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 		ValueLabel.Size = UDim2.new(1, 0, 1, 0)
 		ValueLabel.ZIndex = ZINdex + 14
-		ValueLabel.Font = Enum.Font.GothamMedium
+		ValueLabel.FontFace = NeverLose.MontserratMedium
 		ValueLabel.Text = NeverLose:KeyCodeToStr(Config.Default or "None")
 		ValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 		ValueLabel.TextSize = 10.000
@@ -2823,7 +2857,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		TextBox.Size = UDim2.new(1, -5, 0, 17)
 		TextBox.ZIndex = ZINdex + 14
 		TextBox.ClearTextOnFocus = false
-		TextBox.Font = Enum.Font.GothamMedium
+		TextBox.FontFace = NeverLose.MontserratMedium
 		TextBox.PlaceholderText = Config.Placeholder
 		TextBox.Text = tostring(Config.Default)
 		TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -3213,7 +3247,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 				ItemLabel.Position = UDim2.new(0, 15, 0, 4)
 				ItemLabel.Size = UDim2.new(0,1, 0, 15)
 				ItemLabel.ZIndex = ZINdex + 1258
-				ItemLabel.Font = Enum.Font.GothamMedium
+				ItemLabel.FontFace = NeverLose.MontserratMedium
 				ItemLabel.Text = tostring(Value);
 				ItemLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 				ItemLabel.TextSize = 13.000
@@ -3500,7 +3534,7 @@ function NeverLose:CreateToolTips(Container: Frame , Name: string , Content: str
 	TooltipName.Position = UDim2.new(0, 15, 0, 5)
 	TooltipName.Size = UDim2.new(0, 1, 0, 20)
 	TooltipName.ZIndex = 132
-	TooltipName.Font = Enum.Font.GothamBold
+	TooltipName.FontFace = NeverLose.MontserratBold
 	TooltipName.Text = Name
 	TooltipName.TextColor3 = Color3.fromRGB(255, 255, 255)
 	TooltipName.TextSize = 15.000
@@ -3515,7 +3549,7 @@ function NeverLose:CreateToolTips(Container: Frame , Name: string , Content: str
 	TooltipContent.Position = UDim2.new(0, 15, 0, 30)
 	TooltipContent.Size = UDim2.new(0, 1, 0, 15)
 	TooltipContent.ZIndex = 132
-	TooltipContent.Font = Enum.Font.GothamBold
+	TooltipContent.FontFace = NeverLose.MontserratBold
 	TooltipContent.Text = Content
 	TooltipContent.TextColor3 = Color3.fromRGB(255, 255, 255)
 	TooltipContent.TextSize = 12.000
@@ -3799,7 +3833,7 @@ function NeverLose:RegisiterItem(Frame: Frame , Signel)
 		BasedLabel.Position = UDim2.new(0, 35, 0, 6)
 		BasedLabel.Size = UDim2.new(0,1, 0, 15)
 		BasedLabel.ZIndex = LayerIndex + 9
-		BasedLabel.Font = Enum.Font.GothamMedium
+		BasedLabel.FontFace = NeverLose.MontserratMedium
 		BasedLabel.Text = Config.Name;
 		BasedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 		BasedLabel.TextSize = 13.000
@@ -3933,7 +3967,7 @@ function NeverLose:RegisiterItem(Frame: Frame , Signel)
 		UserLabel.Position = UDim2.new(0, 65, 0, 10)
 		UserLabel.Size = UDim2.new(1, -35, 0, 15)
 		UserLabel.ZIndex = LayerIndex + 9
-		UserLabel.Font = Enum.Font.GothamMedium
+		UserLabel.FontFace = NeverLose.MontserratMedium
 		UserLabel.Text = Name or 'User'
 		UserLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 		UserLabel.TextSize = 13.000
@@ -3977,7 +4011,7 @@ function NeverLose:RegisiterItem(Frame: Frame , Signel)
 		UserStatusLabel.Position = UDim2.new(0, 65, 0, 25)
 		UserStatusLabel.Size = UDim2.new(1, -35, 0, 15)
 		UserStatusLabel.ZIndex = LayerIndex + 9
-		UserStatusLabel.Font = Enum.Font.GothamMedium
+		UserStatusLabel.FontFace = NeverLose.MontserratMedium
 		UserStatusLabel.Text = Expires or 'Never'
 		UserStatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 		UserStatusLabel.TextSize = 13.000
@@ -4429,7 +4463,7 @@ function NeverLose:CreateWindow(Config)
 	WindowContent.Position = UDim2.new(0, 0, 0, 0)
 	WindowContent.Size = UDim2.new(0, 0, 0, 0)
 	WindowContent.ZIndex = 7
-	WindowContent.Font = Enum.Font.GothamBold
+	WindowContent.FontFace = NeverLose.MontserratBold
 	WindowContent.Text = Window.Content
 	WindowContent.TextColor3 = Color3.fromRGB(255, 255, 255)
 	WindowContent.TextSize = 9.000
@@ -4669,7 +4703,7 @@ function NeverLose:CreateWindow(Config)
 	ConfigName.Position = UDim2.new(0, 40, 0.5, 0)
 	ConfigName.Size = UDim2.new(1, -7, 0, 15)
 	ConfigName.ZIndex = 9
-	ConfigName.Font = Enum.Font.GothamMedium
+	ConfigName.FontFace = NeverLose.MontserratMedium
 	ConfigName.Text = "Default"
 	ConfigName.TextColor3 = Color3.fromRGB(255, 255, 255)
 	ConfigName.TextSize = 12.000
@@ -4734,7 +4768,7 @@ function NeverLose:CreateWindow(Config)
 	SearchBox.Size = UDim2.new(1, -35, 0, 25)
 	SearchBox.ZIndex = 12
 	SearchBox.ClearTextOnFocus = false
-	SearchBox.Font = Enum.Font.GothamMedium
+	SearchBox.FontFace = NeverLose.MontserratMedium
 	SearchBox.PlaceholderText = "Search"
 	SearchBox.Text = ""
 	SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -5459,7 +5493,7 @@ function NeverLose:CreateWindow(Config)
 		BasedLabel.Position = UDim2.new(0, 11, 0, 6)
 		BasedLabel.Size = UDim2.new(0,1, 0, 15)
 		BasedLabel.ZIndex = 154
-		BasedLabel.Font = Enum.Font.GothamMedium
+		BasedLabel.FontFace = NeverLose.MontserratMedium
 		BasedLabel.Text = "Config"
 		BasedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 		BasedLabel.TextSize = 13.000
@@ -5534,7 +5568,7 @@ function NeverLose:CreateWindow(Config)
 		TextBox.Size = UDim2.new(1, -5, 0, 17)
 		TextBox.ZIndex = 154
 		TextBox.ClearTextOnFocus = false
-		TextBox.Font = Enum.Font.GothamMedium
+		TextBox.FontFace = NeverLose.MontserratMedium
 		TextBox.PlaceholderText = "Config Name ..."
 		TextBox.Text = ""
 		TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -5588,7 +5622,7 @@ function NeverLose:CreateWindow(Config)
 		OpenButton.Position = UDim2.new(0, 31, 0.5, 0)
 		OpenButton.Size = UDim2.new(1, -31, 1, 0)
 		OpenButton.ZIndex = 10
-		OpenButton.Font = Enum.Font.SourceSans
+		OpenButton.FontFace = NeverLose.MontserratMedium
 		OpenButton.Text = ""
 		OpenButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 		OpenButton.TextSize = 14.000
@@ -5800,7 +5834,7 @@ function NeverLose:CreateWindow(Config)
 				BasedLabel.Position = UDim2.new(0, 11, 0, 7)
 				BasedLabel.Size = UDim2.new(0, 1, 0, 15)
 				BasedLabel.ZIndex = 153
-				BasedLabel.Font = Enum.Font.GothamMedium
+				BasedLabel.FontFace = NeverLose.MontserratMedium
 				BasedLabel.Text = ConfigNameStr
 				BasedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 				BasedLabel.TextSize = 13.000
@@ -6243,7 +6277,7 @@ function NeverLose:CreateWindow(Config)
 			Content.Position = UDim2.new(0, 35, 0.5, 0)
 			Content.Size = UDim2.new(0, 1, 0, 25)
 			Content.ZIndex = 17
-			Content.Font = Enum.Font.GothamBold
+			Content.FontFace = NeverLose.MontserratBold
 			Content.Text = Name
 			Content.TextColor3 = Color3.fromRGB(186, 186, 186)
 			Content.TextSize = 15.000
@@ -6443,7 +6477,7 @@ function NeverLose:CreateNotification()
 		NotifyName.Position = UDim2.new(0, 50, 0, 7)
 		NotifyName.Size = UDim2.new(0, 200, 0, 20)
 		NotifyName.ZIndex = 132
-		NotifyName.Font = Enum.Font.GothamBold
+		NotifyName.FontFace = NeverLose.MontserratBold
 		NotifyName.Text = Config.Title
 		NotifyName.TextColor3 = Color3.fromRGB(255, 255, 255)
 		NotifyName.TextSize = 17.000
@@ -6458,7 +6492,7 @@ function NeverLose:CreateNotification()
 		NotifyContent.Position = UDim2.new(0, 50, 0, 28)
 		NotifyContent.Size = UDim2.new(0, 200, 0, 15)
 		NotifyContent.ZIndex = 132
-		NotifyContent.Font = Enum.Font.GothamBold
+		NotifyContent.FontFace = NeverLose.MontserratBold
 		NotifyContent.Text = Config.Content
 		NotifyContent.TextColor3 = Color3.fromRGB(255, 255, 255)
 		NotifyContent.TextSize = 12.000
@@ -6590,7 +6624,7 @@ function NeverLose:CreateLogger()
 		LogContent.Position = UDim2.new(0, 25, 0, 2)
 		LogContent.Size = UDim2.new(0, 200, 0, 15)
 		LogContent.ZIndex = 132
-		LogContent.Font = Enum.Font.GothamBold
+		LogContent.FontFace = NeverLose.MontserratBold
 		LogContent.Text = Message
 		LogContent.TextColor3 = Color3.fromRGB(255, 255, 255)
 		LogContent.TextSize = 12.000
@@ -6804,7 +6838,7 @@ function NeverLose:CreateIndicator()
 		Content.Position = UDim2.new(0, 40, 0.5, 0)
 		Content.Size = UDim2.new(1, -40, 0, 25)
 		Content.ZIndex = 17
-		Content.Font = Enum.Font.GothamBold
+		Content.FontFace = NeverLose.MontserratBold
 		Content.Text = Config.Name
 		Content.TextColor3 = Color3.fromRGB(186, 186, 186)
 		Content.TextSize = 20.000
