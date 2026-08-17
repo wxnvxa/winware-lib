@@ -944,6 +944,239 @@ NeverLose.PlayAnimate = LPH_NO_VIRTUALIZE(function(Self , Info , Property)
 	return Tween;
 end);
 
+function NeverLose:EnableOverflowMarquee(Label: TextLabel, Options)
+	if not Label or not Label:IsA("TextLabel") or Label:GetAttribute("WinWareMarqueeEnabled") then
+		return;
+	end;
+
+	local fontFamily = "";
+	pcall(function()
+		fontFamily = Label.FontFace.Family;
+	end);
+
+	if string.find(fontFamily, "BuilderIcons", 1, true) then
+		return;
+	end;
+
+	Options = Options or {};
+	Label:SetAttribute("WinWareMarqueeEnabled", true);
+
+	local HoverTarget = Options.HoverTarget or Label;
+	local Hovered = false;
+	local Active = false;
+	local ActiveTween;
+	local MarqueeLabel;
+	local OriginalSize;
+	local OriginalClipsDescendants;
+	local VisibleTransparency = Label.TextTransparency;
+	local InternalTransparencyChange = false;
+	local StartGeneration = 0;
+
+	local function SetOriginalTransparency(Value)
+		InternalTransparencyChange = true;
+		Label.TextTransparency = Value;
+		InternalTransparencyChange = false;
+	end;
+
+	local function GetVisibleWidth()
+		if Options.GetVisibleWidth then
+			local success, width = pcall(Options.GetVisibleWidth);
+			if success and type(width) == "number" then
+				return math.max(math.floor(width), 0);
+			end;
+		end;
+
+		local width = Label.AbsoluteSize.X;
+		if width <= 4 and Label.Parent and Label.Parent:IsA("GuiObject") then
+			local Parent = Label.Parent;
+			local leftOffset = Label.AbsolutePosition.X - Parent.AbsolutePosition.X;
+			width = Parent.AbsoluteSize.X - leftOffset - 8;
+		end;
+
+		return math.max(math.floor(width), 0);
+	end;
+
+	local function GetTextWidth()
+		local width = Label.TextBounds.X;
+		local Params;
+
+		pcall(function()
+			Params = Instance.new("GetTextBoundsParams");
+			Params.Text = Label.Text;
+			Params.Font = Label.FontFace;
+			Params.Size = Label.TextSize;
+			Params.Width = 100000;
+			width = TextService:GetTextBoundsAsync(Params).X;
+		end);
+
+		if Params then
+			Params:Destroy();
+		end;
+
+		return math.ceil(width);
+	end;
+
+	local function Stop()
+		StartGeneration = StartGeneration + 1;
+
+		if not Active then
+			return;
+		end;
+
+		Active = false;
+		if ActiveTween then
+			ActiveTween:Cancel();
+			ActiveTween = nil;
+		end;
+
+		if MarqueeLabel then
+			MarqueeLabel:Destroy();
+			MarqueeLabel = nil;
+		end;
+
+		SetOriginalTransparency(VisibleTransparency);
+		Label.ClipsDescendants = OriginalClipsDescendants;
+
+		if OriginalSize then
+			Label.Size = OriginalSize;
+			OriginalSize = nil;
+		end;
+	end;
+
+	local function Start()
+		Stop();
+		local Generation = StartGeneration;
+
+		if not Hovered or not Label.Parent or not Label.Visible or Label.Text == "" then
+			return;
+		end;
+
+		local visibleWidth = GetVisibleWidth();
+		local textWidth = GetTextWidth();
+		if Generation ~= StartGeneration or not Hovered or not Label.Parent or visibleWidth <= 4 or textWidth <= visibleWidth + 1 then
+			return;
+		end;
+
+		OriginalSize = Label.Size;
+		if Label.AbsoluteSize.X <= 4 then
+			Label.Size = UDim2.new(0, visibleWidth, OriginalSize.Y.Scale, OriginalSize.Y.Offset);
+		end;
+
+		OriginalClipsDescendants = Label.ClipsDescendants;
+		VisibleTransparency = Label.TextTransparency;
+		Label.ClipsDescendants = true;
+
+		MarqueeLabel = Label:Clone();
+		MarqueeLabel:SetAttribute("WinWareMarqueeEnabled", true);
+		MarqueeLabel.Name = NeverLose.RandomString();
+		MarqueeLabel.Active = false;
+		MarqueeLabel.AnchorPoint = Vector2.zero;
+		MarqueeLabel.AutomaticSize = Enum.AutomaticSize.None;
+		MarqueeLabel.BackgroundTransparency = 1;
+		MarqueeLabel.Position = UDim2.fromOffset(0, 0);
+		MarqueeLabel.Size = UDim2.fromOffset(textWidth, math.max(Label.AbsoluteSize.Y, Label.TextSize + 2));
+		MarqueeLabel.TextScaled = false;
+		MarqueeLabel.TextTransparency = VisibleTransparency;
+		MarqueeLabel.TextTruncate = Enum.TextTruncate.None;
+		MarqueeLabel.TextWrapped = false;
+		MarqueeLabel.TextXAlignment = Enum.TextXAlignment.Left;
+		MarqueeLabel.ZIndex = Label.ZIndex + 1;
+		MarqueeLabel.Parent = Label;
+
+		Active = true;
+		SetOriginalTransparency(1);
+
+		local overflow = textWidth - visibleWidth;
+		local duration = math.clamp(overflow / 22, 2.4, 8);
+
+		task.spawn(function()
+			while Active and Hovered and MarqueeLabel and MarqueeLabel.Parent do
+				ActiveTween = TweenService:Create(MarqueeLabel, TweenInfo.new(duration, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+					Position = UDim2.fromOffset(-overflow, 0),
+				});
+				ActiveTween:Play();
+				ActiveTween.Completed:Wait();
+
+				if not Active or not Hovered or not MarqueeLabel then
+					break;
+				end;
+
+				task.wait(0.45);
+				ActiveTween = TweenService:Create(MarqueeLabel, TweenInfo.new(duration, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+					Position = UDim2.fromOffset(0, 0),
+				});
+				ActiveTween:Play();
+				ActiveTween.Completed:Wait();
+
+				if Active and Hovered then
+					task.wait(0.45);
+				end;
+			end;
+		end);
+	end;
+
+	NeverLose:AddSignal(Label:GetPropertyChangedSignal("TextTransparency"):Connect(function()
+		if InternalTransparencyChange then
+			return;
+		end;
+
+		VisibleTransparency = Label.TextTransparency;
+		if Active and MarqueeLabel then
+			MarqueeLabel.TextTransparency = VisibleTransparency;
+			SetOriginalTransparency(1);
+		end;
+	end));
+
+	NeverLose:AddSignal(Label:GetPropertyChangedSignal("Text"):Connect(function()
+		if Hovered then
+			Stop();
+			task.defer(Start);
+		end;
+	end));
+
+	NeverLose:AddSignal(HoverTarget.MouseEnter:Connect(function()
+		Hovered = true;
+		Start();
+	end));
+
+	NeverLose:AddSignal(HoverTarget.MouseLeave:Connect(function()
+		Hovered = false;
+		Stop();
+	end));
+
+	NeverLose:AddSignal(Label.AncestryChanged:Connect(function(_, Parent)
+		if not Parent then
+			Hovered = false;
+			Stop();
+		end;
+	end));
+end;
+
+local function RegisterOverflowMarquee(Descendant)
+	if not Descendant:IsA("TextLabel") then
+		return;
+	end;
+
+	task.defer(function()
+		if Descendant.Parent and not Descendant:GetAttribute("WinWareMarqueeEnabled") then
+			local HoverTarget = Descendant;
+			if Descendant.AbsoluteSize.X <= 4 and Descendant.Parent:IsA("GuiObject") then
+				HoverTarget = Descendant.Parent;
+			end;
+
+			NeverLose:EnableOverflowMarquee(Descendant, {
+				HoverTarget = HoverTarget,
+			});
+		end;
+	end);
+end;
+
+NeverLose:AddSignal(GlobalWindow.DescendantAdded:Connect(RegisterOverflowMarquee));
+
+for _, Descendant in next, GlobalWindow:GetDescendants() do
+	RegisterOverflowMarquee(Descendant);
+end;
+
 NeverLose.Drag = LPH_NO_VIRTUALIZE(function(InputFrame: Frame, MoveFrame: Frame, Speed : number)
 	local dragToggle: boolean = false;
 	local dragStart: Vector3 = nil;
@@ -3741,6 +3974,18 @@ function NeverLose:RegisiterItem(Frame: Frame , Signel)
 		end;
 
 		local handle = NeverLose:RegisiterHandler(BasedHandler , Signel);
+		local function UpdateLabelWidth()
+			if Warp then
+				return;
+			end;
+
+			local availableWidth = BasedFrame.AbsoluteSize.X - BasedLabel.Position.X.Offset - UIListLayout.AbsoluteContentSize.X - 20;
+			BasedLabel.Size = UDim2.new(0, math.max(math.floor(availableWidth), 32), 1, 0);
+		end;
+
+		NeverLose:AddSignal(UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(UpdateLabelWidth));
+		NeverLose:AddSignal(BasedFrame:GetPropertyChangedSignal("AbsoluteSize"):Connect(UpdateLabelWidth));
+		task.defer(UpdateLabelWidth);
 
 		handle.Root = BasedFrame;
 
@@ -6400,6 +6645,7 @@ function NeverLose:CreateNotification()
 	UIListLayout.Padding = UDim.new(0, 0)
 
 	NeverLose.__Notification_Cache = Notifier;
+	Notifier.ActiveKeys = {};
 
 	function Notifier.new(Config)
 		Config = NeverLose:ProcessParams(Config , {
@@ -6408,6 +6654,15 @@ function NeverLose:CreateNotification()
 			Logo = NeverLose.GlobalLogo or "rbxasset://textures/ui/VerifiedBadgeNameIcon.png",
 			Duration = 5,
 		});
+
+		local NotificationKey = tostring(Config.Title).."\0"..tostring(Config.Content);
+		local ExistingNotification = Notifier.ActiveKeys[NotificationKey];
+		if ExistingNotification then
+			return ExistingNotification.Frame;
+		end;
+
+		local NotificationToken = {};
+		Notifier.ActiveKeys[NotificationKey] = NotificationToken;
 
 		if NeverLose.__WatermarkCache then
 			NeverLose.PlayAnimate(Notification,SlowyTween , {
@@ -6432,6 +6687,7 @@ function NeverLose:CreateNotification()
 		ContainerFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ContainerFrame.BorderSizePixel = 0
 		ContainerFrame.Size = UDim2.new(0, 0, 0, 100)
+		NotificationToken.Frame = ContainerFrame;
 
 		NotifyFrame.Name = NeverLose.RandomString();
 		NotifyFrame.Parent = ContainerFrame
@@ -6475,7 +6731,7 @@ function NeverLose:CreateNotification()
 		NotifyName.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		NotifyName.BorderSizePixel = 0
 		NotifyName.Position = UDim2.new(0, 50, 0, 7)
-		NotifyName.Size = UDim2.new(0, 200, 0, 20)
+		NotifyName.Size = UDim2.new(1, -60, 0, 20)
 		NotifyName.ZIndex = 132
 		NotifyName.FontFace = NeverLose.MontserratBold
 		NotifyName.Text = Config.Title
@@ -6490,7 +6746,7 @@ function NeverLose:CreateNotification()
 		NotifyContent.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		NotifyContent.BorderSizePixel = 0
 		NotifyContent.Position = UDim2.new(0, 50, 0, 28)
-		NotifyContent.Size = UDim2.new(0, 200, 0, 15)
+		NotifyContent.Size = UDim2.new(1, -60, 0, 15)
 		NotifyContent.ZIndex = 132
 		NotifyContent.FontFace = NeverLose.MontserratBold
 		NotifyContent.Text = Config.Content
@@ -6504,7 +6760,7 @@ function NeverLose:CreateNotification()
 
 		local MainSize = math.max(Size1.X , Size2.X);
 
-		NotifyFrame.Size = UDim2.new(0, MainSize + 65, 0, 55);
+		NotifyFrame.Size = UDim2.new(0, math.clamp(MainSize + 65, 180, 280), 0, 55);
 
 		shadow:Render(true)
 		NeverLose.PlayAnimate(NotifyFrame , VSlowTween , {
@@ -6552,7 +6808,12 @@ function NeverLose:CreateNotification()
 			task.wait(0.125);
 
 			ContainerFrame:Destroy();
+			if Notifier.ActiveKeys[NotificationKey] == NotificationToken then
+				Notifier.ActiveKeys[NotificationKey] = nil;
+			end;
 		end))
+
+		return ContainerFrame;
 	end;
 
 	return Notifier;
