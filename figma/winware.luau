@@ -1091,22 +1091,45 @@ function NeverLose:EnableOverflowMarquee(Label: TextLabel, Options)
 
 		task.spawn(function()
 			while Active and Hovered and MarqueeLabel and MarqueeLabel.Parent do
-				ActiveTween = TweenService:Create(MarqueeLabel, TweenInfo.new(duration, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-					Position = UDim2.fromOffset(-overflow, 0),
-				});
-				ActiveTween:Play();
-				ActiveTween.Completed:Wait();
+				local OutTween;
+				local OutSuccess = pcall(function()
+					OutTween = TweenService:Create(MarqueeLabel, TweenInfo.new(duration, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+						Position = UDim2.fromOffset(-overflow, 0),
+					});
+				end);
 
-				if not Active or not Hovered or not MarqueeLabel then
+				if not OutSuccess or not OutTween or not Active or not Hovered or not MarqueeLabel or not MarqueeLabel.Parent then
+					break;
+				end;
+
+				ActiveTween = OutTween;
+				OutTween:Play();
+				OutTween.Completed:Wait();
+
+				if not Active or not Hovered or not MarqueeLabel or not MarqueeLabel.Parent then
 					break;
 				end;
 
 				task.wait(0.45);
-				ActiveTween = TweenService:Create(MarqueeLabel, TweenInfo.new(duration, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-					Position = UDim2.fromOffset(0, 0),
-				});
-				ActiveTween:Play();
-				ActiveTween.Completed:Wait();
+
+				if not Active or not Hovered or not MarqueeLabel or not MarqueeLabel.Parent then
+					break;
+				end;
+
+				local BackTween;
+				local BackSuccess = pcall(function()
+					BackTween = TweenService:Create(MarqueeLabel, TweenInfo.new(duration, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+						Position = UDim2.fromOffset(0, 0),
+					});
+				end);
+
+				if not BackSuccess or not BackTween or not Active or not Hovered or not MarqueeLabel or not MarqueeLabel.Parent then
+					break;
+				end;
+
+				ActiveTween = BackTween;
+				BackTween:Play();
+				BackTween.Completed:Wait();
 
 				if Active and Hovered then
 					task.wait(0.45);
