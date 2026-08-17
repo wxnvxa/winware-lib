@@ -2761,7 +2761,7 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 		ValueLabel.FontFace = WinWare.MontserratMedium
 		ValueLabel.Text = tostring(Config.Default)..tostring(Config.Type);
 		ValueLabel.TextColor3 = Color3.fromRGB(206, 206, 206)
-		ValueLabel.TextSize = 12.000
+		ValueLabel.TextSize = 13.000
 		ValueLabel.ClearTextOnFocus = false;
 		ValueLabel.TextTransparency = 0
 
@@ -3272,7 +3272,7 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 		ValueLabel.FontFace = WinWare.MontserratMedium
 		ValueLabel.Text = WinWare:KeyCodeToStr(Config.Default or "None")
 		ValueLabel.TextColor3 = Color3.fromRGB(206, 206, 206)
-		ValueLabel.TextSize = 12.000
+		ValueLabel.TextSize = 13.000
 		ValueLabel.TextTransparency = 0.050
 
 		KeybindLib.SetRender = LPH_NO_VIRTUALIZE(function(value)
@@ -3427,7 +3427,7 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 		TextBox.PlaceholderText = Config.Placeholder
 		TextBox.Text = tostring(Config.Default)
 		TextBox.TextColor3 = Color3.fromRGB(206, 206, 206)
-		TextBox.TextSize = 13.000
+		TextBox.TextSize = 14.000
 		TextBox.TextTransparency = 0.050
 		TextBox.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -3560,10 +3560,10 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 		BasedLabel.Position = UDim2.new(0, 5, 0.5, 0)
 		BasedLabel.Size = UDim2.new(1, -25, 0, 15)
 		BasedLabel.ZIndex = ZINdex + 14
-		BasedLabel.FontFace = WinWare.MontserratMedium
+		BasedLabel.FontFace = WinWare.MontserratSemiBold
 		BasedLabel.Text = WinWare.ParseDropdown(Config.Default);
 		BasedLabel.TextColor3 = Color3.fromRGB(206, 206, 206)
-		BasedLabel.TextSize = 12.000
+		BasedLabel.TextSize = 14.000
 		BasedLabel.TextTransparency = 0
 		BasedLabel.TextXAlignment = Enum.TextXAlignment.Center
 
@@ -3823,7 +3823,7 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 				ItemLabel.FontFace = WinWare.MontserratMedium
 				ItemLabel.Text = tostring(Value);
 				ItemLabel.TextColor3 = Color3.fromRGB(206, 206, 206)
-				ItemLabel.TextSize = 13.000
+				ItemLabel.TextSize = 14.000
 				ItemLabel.TextTransparency = 0.200
 				ItemLabel.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -4307,10 +4307,10 @@ function WinWare:RegisiterItem(Frame: Frame , Signel)
 		BasedLabel.Position = UDim2.new(0, 10, 0, 0)
 		BasedLabel.Size = UDim2.new(0, 155, 1, 0)
 		BasedLabel.ZIndex = LayerIndex + 9
-		BasedLabel.FontFace = WinWare.MontserratMedium
+		BasedLabel.FontFace = WinWare.MontserratSemiBold
 		BasedLabel.Text = Name
 		BasedLabel.TextColor3 = Color3.fromRGB(206, 206, 206)
-		BasedLabel.TextSize = 14.000
+		BasedLabel.TextSize = 15.000
 		BasedLabel.TextTransparency = 0
 		BasedLabel.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -4467,10 +4467,10 @@ function WinWare:RegisiterItem(Frame: Frame , Signel)
 		BasedLabel.Position = UDim2.new(0, 38, 0, 9)
 		BasedLabel.Size = UDim2.new(1, -50, 0, 18)
 		BasedLabel.ZIndex = LayerIndex + 9
-		BasedLabel.FontFace = WinWare.MontserratMedium
+		BasedLabel.FontFace = WinWare.MontserratSemiBold
 		BasedLabel.Text = Config.Name;
 		BasedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-		BasedLabel.TextSize = 13.000
+		BasedLabel.TextSize = 14.000
 		BasedLabel.TextTransparency = 0.200
 		BasedLabel.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -5204,10 +5204,10 @@ function WinWare:CreateWindow(Config)
 	AccountName.Position = UDim2.new(0, 68, 0, 22)
 	AccountName.Size = UDim2.new(0, 96, 0, 18)
 	AccountName.ZIndex = 7
-	AccountName.FontFace = WinWare.MontserratSemiBold
+	AccountName.FontFace = WinWare.MontserratBold
 	AccountName.Text = ""
 	AccountName.TextColor3 = Color3.fromRGB(18, 168, 96)
-	AccountName.TextSize = 13.000
+	AccountName.TextSize = 14.000
 	AccountName.TextXAlignment = Enum.TextXAlignment.Left
 	AccountName.TextTruncate = Enum.TextTruncate.AtEnd;
 	local AccountNameGradient = Instance.new("UIGradient", AccountName)
@@ -5225,7 +5225,7 @@ function WinWare:CreateWindow(Config)
 	ExpireLabel.FontFace = WinWare.MontserratSemiBold
 	ExpireLabel.Text = "Never"
 	ExpireLabel.TextColor3 = Color3.fromRGB(145, 145, 145)
-	ExpireLabel.TextSize = 10.000
+	ExpireLabel.TextSize = 12.000
 	ExpireLabel.TextTransparency = 0
 	ExpireLabel.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -5619,10 +5619,10 @@ function WinWare:CreateWindow(Config)
 		TabLabel.BorderSizePixel = 0
 		TabLabel.Size = UDim2.new(1, -7, 0, 15)
 		TabLabel.ZIndex = 8
-		TabLabel.FontFace = WinWare.MontserratSemiBold
+		TabLabel.FontFace = WinWare.MontserratBold
 		TabLabel.Text = Name
 		TabLabel.TextColor3 = Color3.fromRGB(76, 76, 76)
-		TabLabel.TextSize = 10.000
+		TabLabel.TextSize = 12.000
 		TabLabel.TextTransparency = 0
 		TabLabel.TextXAlignment = Enum.TextXAlignment.Center
 		if #Window.Tabs > 0 then
@@ -5695,7 +5695,7 @@ function WinWare:CreateWindow(Config)
 		TabIcon.FontFace = WinWare.BuiltInBold
 		TabIcon.Text = Config.Icon;
 		TabIcon.TextColor3 = WinWare.AccentColor
-		TabIcon.TextSize = 16.000
+		TabIcon.TextSize = 18.000
 		TabIcon.TextWrapped = true
 
 		TabContentLabel.Name = WinWare.RandomString();
@@ -5708,10 +5708,10 @@ function WinWare:CreateWindow(Config)
 		TabContentLabel.Position = UDim2.new(0, 37, 0.5, 0)
 		TabContentLabel.Size = UDim2.new(1, -44, 0, 18)
 		TabContentLabel.ZIndex = 9
-		TabContentLabel.FontFace = WinWare.MontserratMedium
+		TabContentLabel.FontFace = WinWare.MontserratSemiBold
 		TabContentLabel.Text = Config.Name
 		TabContentLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-		TabContentLabel.TextSize = 13.000
+		TabContentLabel.TextSize = 15.000
 		TabContentLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 		local TabFrame = Instance.new("Frame")
@@ -5913,7 +5913,7 @@ function WinWare:CreateWindow(Config)
 			SectionLabel.FontFace = WinWare.MontserratSemiBold
 			SectionLabel.Text = Config.Name
 			SectionLabel.TextColor3 = Color3.fromRGB(76, 76, 76)
-			SectionLabel.TextSize = 14.000
+			SectionLabel.TextSize = 15.000
 			SectionLabel.TextTransparency = 0
 			SectionLabel.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -6192,7 +6192,7 @@ function WinWare:CreateWindow(Config)
 		BasedLabel.FontFace = WinWare.MontserratMedium
 		BasedLabel.Text = "Config"
 		BasedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-		BasedLabel.TextSize = 13.000
+		BasedLabel.TextSize = 14.000
 		BasedLabel.TextTransparency = 0.200
 		BasedLabel.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -6269,7 +6269,7 @@ function WinWare:CreateWindow(Config)
 		TextBox.PlaceholderText = "Config Name ..."
 		TextBox.Text = ""
 		TextBox.TextColor3 = Color3.fromRGB(206, 206, 206)
-		TextBox.TextSize = 13.000
+		TextBox.TextSize = 14.000
 		TextBox.TextTransparency = 0.050
 		TextBox.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -6534,7 +6534,7 @@ function WinWare:CreateWindow(Config)
 				BasedLabel.FontFace = WinWare.MontserratMedium
 				BasedLabel.Text = ConfigNameStr
 				BasedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-				BasedLabel.TextSize = 13.000
+				BasedLabel.TextSize = 14.000
 				BasedLabel.TextTransparency = 0.200
 				BasedLabel.TextXAlignment = Enum.TextXAlignment.Left
 
