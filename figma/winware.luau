@@ -185,7 +185,12 @@ end);
 
 ProtectGui(GlobalWindow);
 
-GlobalWindow.Name = NeverLose.RandomString();
+local PreviousWinWareGui = CoreGui:FindFirstChild("WinWareUI");
+if PreviousWinWareGui then
+	PreviousWinWareGui:Destroy();
+end;
+
+GlobalWindow.Name = "WinWareUI";
 GlobalWindow.IgnoreGuiInset = true;
 GlobalWindow.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 GlobalWindow.ResetOnSpawn = false;
