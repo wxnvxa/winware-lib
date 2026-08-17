@@ -1810,8 +1810,8 @@ function NeverLose:CreateOptionWindow(Frame: Frame , Zindex)
 	OptionHandler.Parent = NeverLose.ScreenGui
 	OptionHandler.AnchorPoint = Vector2.new(0, 0)
 	OptionHandler.BackgroundColor3 = NeverLose.PopupSurfaceColor
-	OptionHandler.BackgroundTransparency = 0.035
-	NeverLose.ApplyPopupSurface(OptionHandler , 0.035);
+	OptionHandler.BackgroundTransparency = 0.100
+	NeverLose.ApplyPopupSurface(OptionHandler , 0.100);
 	OptionHandler.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	OptionHandler.BorderSizePixel = 0
 	OptionHandler.ClipsDescendants = true
@@ -1875,7 +1875,7 @@ function NeverLose:CreateOptionWindow(Frame: Frame , Zindex)
 			SetPosition();
 
 			NeverLose.PlayAnimate(OptionHandler , SlowyTween , {
-				BackgroundTransparency = 0.035
+				BackgroundTransparency = 0.100
 			})
 
 			NeverLose.PlayAnimate(UIStroke , SlowyTween , {
@@ -1947,8 +1947,8 @@ function NeverLose:CreateModuleOptionWindow(Trigger: Frame, Zindex, Config)
 	Root.Name = NeverLose.RandomString()
 	Root.AnchorPoint = Vector2.new(0.5, 0.5)
 	Root.BackgroundColor3 = NeverLose.PopupSurfaceColor
-	Root.BackgroundTransparency = 0.02
-	NeverLose.ApplyPopupSurface(Root , 0.02);
+	Root.BackgroundTransparency = 0.100
+	NeverLose.ApplyPopupSurface(Root , 0.100);
 	Root.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	Root.BorderSizePixel = 0
 	Root.ClipsDescendants = true
@@ -2078,7 +2078,7 @@ function NeverLose:CreateModuleOptionWindow(Trigger: Frame, Zindex, Config)
 				Root.Position = UDim2.fromOffset(TargetX, TargetY);
 			end
 			NeverLose.PlayAnimate(Root, SlowyTween, {
-				BackgroundTransparency = 0.02,
+				BackgroundTransparency = 0.100,
 				Size = UDim2.fromOffset(Config.Width, Config.Height),
 			})
 			NeverLose.PlayAnimate(RootStroke, SlowyTween, { Transparency = NeverLose.PopupStrokeTransparency })
@@ -2169,8 +2169,8 @@ function NeverLose:CreateColorPicker(HandleFrame: Frame)
 	ColorPickerHandler.Parent = NeverLose.ScreenGui
 	ColorPickerHandler.AnchorPoint = Vector2.new(0, 0)
 	ColorPickerHandler.BackgroundColor3 = NeverLose.PopupSurfaceColor
-	ColorPickerHandler.BackgroundTransparency = 0.035
-	NeverLose.ApplyPopupSurface(ColorPickerHandler , 0.035);
+	ColorPickerHandler.BackgroundTransparency = 0.100
+	NeverLose.ApplyPopupSurface(ColorPickerHandler , 0.100);
 	ColorPickerHandler.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	ColorPickerHandler.BorderSizePixel = 0
 	ColorPickerHandler.ClipsDescendants = true
@@ -2290,7 +2290,7 @@ function NeverLose:CreateColorPicker(HandleFrame: Frame)
 			ColorPickerHandler.Position = UDim2.new(0,HandleFrame.AbsolutePosition.X + 20 , 0 ,HandleFrame.AbsolutePosition.Y + 75);
 
 			NeverLose.PlayAnimate(ColorPickerHandler,SlowyTween , {
-				BackgroundTransparency = 0.035
+				BackgroundTransparency = 0.100
 			})
 
 			NeverLose.PlayAnimate(UIStroke,SlowyTween , {
@@ -3646,8 +3646,8 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 			DropdownHandler.Parent = NeverLose.ScreenGui;
 			DropdownHandler.AnchorPoint = Vector2.new(0.5, 0)
 			DropdownHandler.BackgroundColor3 = NeverLose.PopupSurfaceColor
-			DropdownHandler.BackgroundTransparency = 0.035
-			NeverLose.ApplyPopupSurface(DropdownHandler , 0.035);
+			DropdownHandler.BackgroundTransparency = 0.100
+			NeverLose.ApplyPopupSurface(DropdownHandler , 0.100);
 			DropdownHandler.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			DropdownHandler.BorderSizePixel = 0
 			DropdownHandler.ClipsDescendants = true
@@ -3727,7 +3727,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 					SetPosition();
 
 					NeverLose.PlayAnimate(DropdownHandler , SlowyTween , {
-						BackgroundTransparency = 0.035
+						BackgroundTransparency = 0.100
 					})
 
 					if Config.AutoUpdate then
@@ -4130,8 +4130,8 @@ function NeverLose:CreateToolTips(Container: Frame , Name: string , Content: str
 
 	Tooltips.Name = NeverLose.RandomString();
 	Tooltips.BackgroundColor3 = NeverLose.PopupSurfaceColor
-	Tooltips.BackgroundTransparency = 0.075
-	NeverLose.ApplyPopupSurface(Tooltips , 0.075);
+	Tooltips.BackgroundTransparency = 0.100
+	NeverLose.ApplyPopupSurface(Tooltips , 0.100);
 	Tooltips.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	Tooltips.BorderSizePixel = 0
 	Tooltips.ClipsDescendants = true
@@ -4213,7 +4213,7 @@ function NeverLose:CreateToolTips(Container: Frame , Name: string , Content: str
 			Tooltips.Position = UDim2.fromOffset(Container.AbsolutePosition.X + Container.AbsoluteSize.X , Container.AbsolutePosition.Y + (Container.AbsoluteSize.Y + 25));
 
 			NeverLose.PlayAnimate(Tooltips , SlowyTween , {
-				BackgroundTransparency = 0.075
+				BackgroundTransparency = 0.100
 			})
 
 			NeverLose.PlayAnimate(UIStroke , SlowyTween , {
@@ -5895,7 +5895,7 @@ function NeverLose:CreateWindow(Config)
 			SectionFrame.Name = NeverLose.RandomString();
 			SectionFrame.Parent = (string.lower(Config.Position) == 'left' and LeftScroll) or RightScroll
 			SectionFrame.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
-			SectionFrame.BackgroundTransparency = 0.000
+			SectionFrame.BackgroundTransparency = 1.000
 			SectionFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			SectionFrame.BorderSizePixel = 0
 			SectionFrame.ClipsDescendants = false
@@ -5923,7 +5923,7 @@ function NeverLose:CreateWindow(Config)
 			SectionHandler.Parent = SectionFrame
 			SectionHandler.AnchorPoint = Vector2.new(0.5, 0)
 			SectionHandler.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
-			SectionHandler.BackgroundTransparency = 0
+			SectionHandler.BackgroundTransparency = 1
 			SectionHandler.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			SectionHandler.BorderSizePixel = 0
 			SectionHandler.ClipsDescendants = true
@@ -6059,7 +6059,7 @@ function NeverLose:CreateWindow(Config)
 				ConfigMenu.Position = UDim2.fromOffset(ConfigFrame.AbsolutePosition.X + 110 , ConfigFrame.AbsolutePosition.Y + 96)
 
 				NeverLose.PlayAnimate(ConfigMenu , SlowyTween , {
-					BackgroundTransparency = 0.035,
+					BackgroundTransparency = 0.100,
 					Position = UDim2.fromOffset(ConfigFrame.AbsolutePosition.X + 110 , ConfigFrame.AbsolutePosition.Y + 95)
 				})	
 
@@ -6151,8 +6151,8 @@ function NeverLose:CreateWindow(Config)
 		ConfigMenu.Parent = NeverLose.ScreenGui;
 		ConfigMenu.AnchorPoint = Vector2.new(0.5, 0)
 		ConfigMenu.BackgroundColor3 = NeverLose.PopupSurfaceColor
-		ConfigMenu.BackgroundTransparency = 0.035
-		NeverLose.ApplyPopupSurface(ConfigMenu , 0.035);
+		ConfigMenu.BackgroundTransparency = 0.100
+		NeverLose.ApplyPopupSurface(ConfigMenu , 0.100);
 		ConfigMenu.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ConfigMenu.BorderSizePixel = 0
 		ConfigMenu.ClipsDescendants = true
@@ -7160,7 +7160,7 @@ function NeverLose:CreateNotification()
 		NotifyFrame.Parent = ContainerFrame
 		NotifyFrame.AnchorPoint = Vector2.new(1, 0)
 		NotifyFrame.BackgroundColor3 = NeverLose.PopupSurfaceColor
-		NotifyFrame.BackgroundTransparency = 0.075
+		NotifyFrame.BackgroundTransparency = 0.100
 		NotifyFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		NotifyFrame.BorderSizePixel = 0
 		NotifyFrame.ClipsDescendants = true
