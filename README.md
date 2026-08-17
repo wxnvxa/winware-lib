@@ -60,4 +60,4 @@ ragebot:AddLabel("Target"):AddDropdown({
 
 Controls with a `Flag` are available through `WinWare.Flags[flag]` and retain the base `GetValue`/`SetValue` methods.
 
-The upstream copyright and MIT license are retained in `LICENSE`.
+Released under the MIT license, see `LICENSE`.
