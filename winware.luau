@@ -1679,6 +1679,30 @@ WinWare.ApplyPopupSurface = LPH_NO_VIRTUALIZE(function(Frame , Transparency)
 	return Frame;
 end);
 
+WinWare.ApplyStackedRow = LPH_NO_VIRTUALIZE(function(Handler , RowHeight , ControlHeight)
+	local Row = Handler.Parent;
+
+	if not Row or not Row:GetAttribute("ControlRow") then
+		return;
+	end;
+
+	Row:SetAttribute("StackedRow" , true);
+	Row.Size = UDim2.new(1, 0, 0, RowHeight);
+
+	for _ , Item in ipairs(Row:GetChildren()) do
+		if Item:IsA("TextLabel") then
+			Item.Position = UDim2.new(0, 10, 0, 5);
+			Item.Size = UDim2.new(1, -20, 0, RowHeight - ControlHeight - 11);
+			Item.TextXAlignment = Enum.TextXAlignment.Center;
+			Item.TextYAlignment = Enum.TextYAlignment.Center;
+		end;
+	end;
+
+	Handler.AnchorPoint = Vector2.new(1, 1);
+	Handler.Position = UDim2.new(1, -10, 1, -6);
+	Handler.Size = UDim2.new(1, -20, 0, ControlHeight);
+end);
+
 local EmptyFunction = function() end;
 
 function WinWare:RollingEffect(parent)
@@ -2660,9 +2684,10 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 		)
 
 		local SliderLib = {};
-		local thumbSize = Config.Compact and 12 or 24
-		local thumbRadius = thumbSize / 2
-		local trackInset = Config.Compact and 0 or 3
+		local thumbSize = Config.Compact and 12 or 18
+		local thumbWidth = Config.Compact and 12 or 24
+		local thumbRadius = thumbWidth / 2
+		local trackInset = Config.Compact and 0 or 4
 
 		SliderLib.GetSize = LPH_NO_VIRTUALIZE(function()
 			local range = Config.Max - Config.Min
@@ -2673,11 +2698,11 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 			return math.clamp((Config.Default - Config.Min) / range, 0, 1);
 		end);
 		SliderLib.GetFillSize = LPH_NO_VIRTUALIZE(function(scale)
-			local offset = thumbRadius - trackInset - (thumbSize * scale)
+			local offset = thumbRadius - trackInset - (thumbWidth * scale)
 			return UDim2.new(scale, offset, 1, -(trackInset * 2))
 		end)
 		SliderLib.GetThumbPosition = LPH_NO_VIRTUALIZE(function(scale)
-			return UDim2.new(scale, thumbRadius - (thumbSize * scale), 0.5, 0)
+			return UDim2.new(scale, thumbRadius - (thumbWidth * scale), 0.5, 0)
 		end)
 
 		local FullNumSize = TextService:GetTextSize(string.rep("0",(Config.Rounding + #tostring(Config.Max))+1)..tostring(Config.Type),10,WinWare.TextMetricFont,Vector2.new(math.huge,math.huge));
@@ -2723,7 +2748,7 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 		Slider.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Slider.BorderSizePixel = 0
 		Slider.ClipsDescendants = false
-		Slider.Size = UDim2.new(0, Config.Size, 0, 30)
+		Slider.Size = Config.Compact and UDim2.new(0, Config.Size, 0, 30) or UDim2.new(1, 0, 0, 26)
 		Slider.ZIndex = ZINdex + 13
 		Slider.LayoutOrder = -(#Handler:GetChildren() + 5);
 
@@ -2732,13 +2757,13 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 
 		ValueFrame.Name = WinWare.RandomString();
 		ValueFrame.Parent = Slider
-		ValueFrame.AnchorPoint = Vector2.new(1, 0)
+		ValueFrame.AnchorPoint = Vector2.new(1, 0.5)
 		ValueFrame.BackgroundColor3 = Color3.fromRGB(11, 11, 11)
 		ValueFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ValueFrame.BorderSizePixel = 0
 		ValueFrame.ClipsDescendants = true
-		ValueFrame.Position = UDim2.new(1, 0, 0, 0)
-		ValueFrame.Size = UDim2.new(0, SliderLib.MaximumSize + boxSize, 0, 30)
+		ValueFrame.Position = UDim2.new(1, 0, 0.5, 0)
+		ValueFrame.Size = UDim2.new(0, SliderLib.MaximumSize + boxSize, 0, Config.Compact and 30 or 22)
 		ValueFrame.ZIndex = ZINdex + 13
 
 		UICorner_2.CornerRadius = UDim.new(0, 9)
@@ -2773,7 +2798,7 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 		SlideMain.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		SlideMain.BorderSizePixel = 0
 		SlideMain.Position = UDim2.new(0, 0, 0.5, 0)
-		SlideMain.Size = UDim2.new(1, -((SliderLib.MaximumSize + 7)), 0, 30)
+		SlideMain.Size = UDim2.new(1, -((SliderLib.MaximumSize + 9)), 0, Config.Compact and 30 or 26)
 		SlideMain.ZIndex = ZINdex + 13
 
 		SlideFrame.Name = WinWare.RandomString();
@@ -2784,7 +2809,7 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 		SlideFrame.BorderSizePixel = 0
 		SlideFrame.ClipsDescendants = not Config.Compact
 		SlideFrame.Position = UDim2.new(0, 0, 0.5, 0)
-		SlideFrame.Size = UDim2.new(1, 0, 0, Config.Compact and 4 or 30)
+		SlideFrame.Size = UDim2.new(1, 0, 0, Config.Compact and 4 or 18)
 		SlideFrame.ZIndex = ZINdex + 13
 
 		UICorner_3.CornerRadius = UDim.new(0, Config.Compact and 2 or 9)
@@ -2795,11 +2820,11 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 		SlideMoving.BackgroundColor3 = Config.Compact and Color3.fromRGB(140, 180, 255) or WinWare.AccentColor
 		SlideMoving.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		SlideMoving.BorderSizePixel = 0
-		SlideMoving.Position = Config.Compact and UDim2.fromOffset(0, 0) or UDim2.fromOffset(3, 3)
+		SlideMoving.Position = Config.Compact and UDim2.fromOffset(0, 0) or UDim2.fromOffset(4, 4)
 		SlideMoving.Size = SliderLib.GetFillSize(SliderLib.GetSize())
 		SlideMoving.ZIndex = ZINdex + 14
 
-		UICorner_4.CornerRadius = UDim.new(0, Config.Compact and 2 or 7)
+		UICorner_4.CornerRadius = UDim.new(0, Config.Compact and 2 or 6)
 		UICorner_4.Parent = SlideMoving
 
 		Frame.Parent = SlideFrame
@@ -2808,11 +2833,15 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 		Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Frame.BorderSizePixel = 0
 		Frame.Position = SliderLib.GetThumbPosition(SliderLib.GetSize())
-		Frame.Size = UDim2.fromOffset(thumbSize, thumbSize)
+		Frame.Size = UDim2.fromOffset(thumbWidth, thumbSize)
 		Frame.ZIndex = ZINdex + 15
 
 		UICorner_5.CornerRadius = UDim.new(0, Config.Compact and 6 or 7)
 		UICorner_5.Parent = Frame
+
+		if not Config.Compact then
+			WinWare.ApplyStackedRow(Handler , 56 , 26);
+		end;
 
 		local LoadText = LPH_NO_VIRTUALIZE(function()
 			if Config.Nums[Config.Default] then
@@ -2856,7 +2885,7 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 			if value then
 				WinWare.PlayAnimate(ValueFrame,SlowyTween,{
 					BackgroundTransparency = 0,
-					Size = UDim2.new(0, SliderLib.MaximumSize + boxSize, 0, 30)
+					Size = UDim2.new(0, SliderLib.MaximumSize + boxSize, 0, Config.Compact and 30 or 22)
 				});
 
 				WinWare.PlayAnimate(UIStroke,SlowyTween,{
@@ -3543,11 +3572,6 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 
 		UIStroke.Transparency = 1
 		UIStroke.Color = Color3.fromRGB(255, 255, 255)
-		local DropdownStroke = Instance.new("UIStroke")
-		DropdownStroke.Color = Color3.fromRGB(255, 255, 255)
-		DropdownStroke.Thickness = 1
-		DropdownStroke.Transparency = 0.92
-		DropdownStroke.Parent = Dropdown
 
 		BasedLabel.Name = WinWare.RandomString();
 		BasedLabel.Parent = Dropdown
@@ -4295,6 +4319,7 @@ function WinWare:RegisiterItem(Frame: Frame , Signel)
 		BasedFrame.BorderSizePixel = 0
 		BasedFrame.Size = UDim2.new(1, 0, 0, 44)
 		BasedFrame.ZIndex = LayerIndex + 8
+		BasedFrame:SetAttribute("ControlRow" , true)
 
 		WinWare:AddQuery(BasedFrame , Name);
 
@@ -4364,7 +4389,7 @@ function WinWare:RegisiterItem(Frame: Frame , Signel)
 
 		local handle = WinWare:RegisiterHandler(BasedHandler , Signel);
 		local function UpdateLabelWidth()
-			if Warp then
+			if Warp or BasedFrame:GetAttribute("StackedRow") then
 				return;
 			end;
 
@@ -5939,7 +5964,7 @@ function WinWare:CreateWindow(Config)
 
 			UIListLayout.Parent = SectionHandler
 			UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-			UIListLayout.Padding = UDim.new(0, 6)
+			UIListLayout.Padding = UDim.new(0, 0)
 
 			local UpdateRowDividers = LPH_NO_VIRTUALIZE(function()
 				local Rows = {};
@@ -5968,8 +5993,8 @@ function WinWare:CreateWindow(Config)
 			end))
 
 			local SectionPadding = Instance.new("UIPadding")
-			SectionPadding.PaddingTop = UDim.new(0, 8)
-			SectionPadding.PaddingBottom = UDim.new(0, 8)
+			SectionPadding.PaddingTop = UDim.new(0, 6)
+			SectionPadding.PaddingBottom = UDim.new(0, 6)
 			SectionPadding.Parent = SectionHandler
 			UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
@@ -5982,7 +6007,7 @@ function WinWare:CreateWindow(Config)
 					})
 				else
 					WinWare.PlayAnimate(SectionFrame , VSlowTween , {
-						Size = UDim2.new(1, -5, 0, UIListLayout.AbsoluteContentSize.Y + 40)
+						Size = UDim2.new(1, -5, 0, UIListLayout.AbsoluteContentSize.Y + 36)
 					})
 				end;
 			end));
