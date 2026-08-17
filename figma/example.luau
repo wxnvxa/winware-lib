@@ -11,8 +11,7 @@ local window = WinWare:CreateWindow({
 })
 
 window:SetAccount({
-	Username = "korsHuesos",
-	Expires = "Until August 15, 2026",
+	Lifetime = true,
 })
 
 local notifier = WinWare:CreateNotification()

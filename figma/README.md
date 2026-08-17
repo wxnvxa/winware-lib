@@ -8,7 +8,7 @@ The default window is `834x534`, the original `1250x800` Figma surface reduced b
 
 ```luau
 loadstring(game:HttpGet(
-	"https://wxnvxa.github.io/winware-lib/figma/example.luau"
+	"https://raw.githubusercontent.com/wxnvxa/winware-lib/main/figma/example.luau"
 ))()
 ```
 
@@ -16,7 +16,7 @@ loadstring(game:HttpGet(
 
 ```luau
 local WinWare = loadstring(game:HttpGet(
-	"https://wxnvxa.github.io/winware-lib/figma/winware.luau"
+	"https://raw.githubusercontent.com/wxnvxa/winware-lib/main/figma/winware.luau"
 ))()
 ```
 
@@ -29,6 +29,9 @@ local window = WinWare:CreateWindow({
     Size = WinWare.Scales.Default,
     Keybind = "Insert",
 })
+
+-- Avatar and username come from Roblox. Omit Lifetime for "Never".
+window:SetAccount({ Lifetime = true })
 
 window:AddTabLabel("MODULES")
 local combat = window:AddTab({ Name = "Combat", Icon = "sword" })
