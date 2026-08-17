@@ -153,9 +153,21 @@ local NeverLose = {};
 
 NeverLose.BuiltInRegular = Font.new('rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json',Enum.FontWeight.Regular,Enum.FontStyle.Normal);
 NeverLose.BuiltInBold = Font.new('rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json',Enum.FontWeight.Bold,Enum.FontStyle.Normal);
-NeverLose.MontserratMedium = Font.new('rbxasset://fonts/families/Montserrat.json',Enum.FontWeight.Medium,Enum.FontStyle.Normal);
-NeverLose.MontserratSemiBold = Font.new('rbxasset://fonts/families/Montserrat.json',Enum.FontWeight.SemiBold,Enum.FontStyle.Normal);
-NeverLose.MontserratBold = Font.new('rbxasset://fonts/families/Montserrat.json',Enum.FontWeight.Bold,Enum.FontStyle.Normal);
+local function CreateMontserratFont(weight)
+	local success, font = pcall(function()
+		return Font.fromName("Montserrat", weight, Enum.FontStyle.Normal)
+	end)
+
+	return success and font or Font.new(
+		"rbxasset://fonts/families/Montserrat.json",
+		weight,
+		Enum.FontStyle.Normal
+	)
+end
+
+NeverLose.MontserratMedium = CreateMontserratFont(Enum.FontWeight.Medium);
+NeverLose.MontserratSemiBold = CreateMontserratFont(Enum.FontWeight.SemiBold);
+NeverLose.MontserratBold = CreateMontserratFont(Enum.FontWeight.Bold);
 NeverLose.GlobalSignals = {};
 NeverLose.UnloadEnabled = false;
 
@@ -4391,16 +4403,22 @@ function NeverLose:CreateWindow(Config)
 	WindowName.BackgroundTransparency = 1.000
 	WindowName.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	WindowName.BorderSizePixel = 0
-	WindowName.Position = UDim2.new(0, 0, 0, 0)
-	WindowName.Size = UDim2.new(1, 0, 1, 0)
+	WindowName.AnchorPoint = Vector2.new(0.5, 0.5)
+	WindowName.Position = UDim2.fromScale(0.5, 0.5)
+	WindowName.Size = UDim2.fromOffset(0, 30)
+	WindowName.AutomaticSize = Enum.AutomaticSize.X
 	WindowName.ZIndex = 7
 	WindowName.FontFace = NeverLose.MontserratBold
 	WindowName.Text = Window.Name
-	WindowName.TextColor3 = Color3.fromRGB(0, 86, 255)
+	WindowName.TextColor3 = Color3.fromRGB(255, 255, 255)
 	WindowName.TextSize = 20.000
 	WindowName.TextXAlignment = Enum.TextXAlignment.Center
 	local WindowNameGradient = Instance.new("UIGradient", WindowName)
-	WindowNameGradient.Color = ColorSequence.new(Color3.fromRGB(27, 39, 88), Color3.fromRGB(0, 86, 255))
+	WindowNameGradient.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(27, 39, 88)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 86, 255)),
+	})
+	WindowNameGradient.Rotation = 0
 
 	WindowContent.Name = NeverLose.RandomString();
 	WindowContent.Parent = HeadFrame
