@@ -1,4 +1,7 @@
-local WinWare = require(script.Parent.winware)
+-- Standalone remote example. The environment must provide loadstring and game:HttpGet.
+local WinWare = loadstring(game:HttpGet(
+	"https://raw.githubusercontent.com/wxnvxa/winware-lib/main/figma/winware.luau"
+))()
 
 local window = WinWare:CreateWindow({
 	Title = "WINWARE",
