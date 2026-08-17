@@ -2114,7 +2114,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 			return UDim2.new(scale, thumbRadius - (thumbSize * scale), 0.5, 0)
 		end)
 
-		local FullNumSize = TextService:GetTextSize(string.rep("0",(Config.Rounding + #tostring(Config.Max))+1)..tostring(Config.Type),10,Enum.Font.MontserratMedium,Vector2.new(math.huge,math.huge));
+		local FullNumSize = TextService:GetTextSize(string.rep("0",(Config.Rounding + #tostring(Config.Max))+1)..tostring(Config.Type),10,Enum.Font.GothamMedium,Vector2.new(math.huge,math.huge));
 
 		SliderLib.MaximumSize = FullNumSize.X;
 		SliderLib.MaximumSize = Config.Compact and 40 or 45;
@@ -2123,7 +2123,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 			local nszie = 0;
 
 			for i,ns in next , Config.Nums do
-				local size = TextService:GetTextSize(string.rep("m",string.len(tostring(ns))),10,Enum.Font.MontserratMedium,Vector2.new(math.huge,math.huge));
+				local size = TextService:GetTextSize(string.rep("m",string.len(tostring(ns))),10,Enum.Font.GothamMedium,Vector2.new(math.huge,math.huge));
 
 				if nszie < size.X then
 					nszie = size.X;
@@ -2738,7 +2738,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 		end);
 
 		function KeybindLib:Update()
-			local size = TextService:GetTextSize(ValueLabel.Text,ValueLabel.TextSize,ValueLabel.Font,Vector2.new(math.huge,math.huge));
+			local size = TextService:GetTextSize(ValueLabel.Text,ValueLabel.TextSize,Enum.Font.GothamMedium,Vector2.new(math.huge,math.huge));
 
 			NeverLose.PlayAnimate(Keybind , SlowyTween , {
 				Size = UDim2.new(0, size.X + 7, 0, 18)
@@ -3256,7 +3256,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
 
 				UICorner.CornerRadius = UDim.new(0, 10)
 				UICorner.Parent = ItemFrame
-				local sizetext = TextService:GetTextSize(ItemLabel.Text , ItemLabel.TextSize,ItemLabel.Font,Vector2.new(math.huge,math.huge));
+				local sizetext = TextService:GetTextSize(ItemLabel.Text , ItemLabel.TextSize,Enum.Font.GothamMedium,Vector2.new(math.huge,math.huge));
 
 				DropdownLib.ExtentSize = math.max(DropdownLib.ExtentSize , sizetext.X);
 
@@ -3560,8 +3560,8 @@ function NeverLose:CreateToolTips(Container: Frame , Name: string , Content: str
 	local ToolTip = {};
 
 	ToolTip.Update = LPH_NO_VIRTUALIZE(function()
-		local SizeName = TextService:GetTextSize(TooltipName.Text , TooltipName.TextSize , TooltipName.Font , Vector2.new(math.huge,math.huge));
-		local SizeContent = TextService:GetTextSize(TooltipContent.Text , TooltipContent.TextSize , TooltipContent.Font , Vector2.new(math.huge,math.huge));
+		local SizeName = TextService:GetTextSize(TooltipName.Text , TooltipName.TextSize , Enum.Font.GothamBold , Vector2.new(math.huge,math.huge));
+		local SizeContent = TextService:GetTextSize(TooltipContent.Text , TooltipContent.TextSize , Enum.Font.GothamBold , Vector2.new(math.huge,math.huge));
 
 		local MaxX = math.max(SizeName.X , SizeContent.X) + 65;
 		local MaxY = SizeName.Y + SizeContent.Y + 30;
@@ -3727,7 +3727,7 @@ function NeverLose:RegisiterItem(Frame: Frame , Signel)
 		UICorner.Parent = BasedFrame
 
 		local UpdateWarp = LPH_NO_VIRTUALIZE(function()
-			local size = TextService:GetTextSize(BasedLabel.Text , BasedLabel.TextSize , BasedLabel.Font , Vector2.new(math.huge,math.huge));
+			local size = TextService:GetTextSize(BasedLabel.Text , BasedLabel.TextSize , Enum.Font.GothamMedium , Vector2.new(math.huge,math.huge));
 			NeverLose.PlayAnimate(BasedFrame , SlowyTween , {
 				Size = UDim2.new(1, 0, 0, size.Y + 13);
 			})
@@ -5636,7 +5636,7 @@ function NeverLose:CreateWindow(Config)
 		ConfigLib.SelectedConfig = "Default";
 
 		local UpdateSize = LPH_NO_VIRTUALIZE(function()
-			local size = TextService:GetTextSize(ConfigName.Text , ConfigName.TextSize,ConfigName.Font,Vector2.new(math.huge,math.huge));
+			local size = TextService:GetTextSize(ConfigName.Text , ConfigName.TextSize,Enum.Font.GothamMedium,Vector2.new(math.huge,math.huge));
 
 			NeverLose.PlayAnimate(ConfigFrame,SlowyTween , {
 				Size = UDim2.fromOffset(size.X + 75, 30)
@@ -6302,7 +6302,7 @@ function NeverLose:CreateWindow(Config)
 			Icon.TextWrapped = true
 
 			InnerBlock.Update = LPH_NO_VIRTUALIZE(function(value)
-				local size = TextService:GetTextSize(Content.Text , Content.TextSize,Content.Font,Vector2.new(math.huge,math.huge))
+				local size = TextService:GetTextSize(Content.Text , Content.TextSize,Enum.Font.GothamBold,Vector2.new(math.huge,math.huge))
 
 				if InnerBlock.Visible then
 					NeverLose.PlayAnimate(Frame,VSlowTween,{
@@ -6499,8 +6499,8 @@ function NeverLose:CreateNotification()
 		NotifyContent.TextTransparency = 0.650
 		NotifyContent.TextXAlignment = Enum.TextXAlignment.Left
 
-		local Size1 = TextService:GetTextSize(NotifyName.Text,NotifyName.TextSize,NotifyName.Font,Vector2.new(math.huge,math.huge));
-		local Size2 = TextService:GetTextSize(NotifyContent.Text,NotifyContent.TextSize,NotifyContent.Font,Vector2.new(math.huge,math.huge));
+		local Size1 = TextService:GetTextSize(NotifyName.Text,NotifyName.TextSize,Enum.Font.GothamBold,Vector2.new(math.huge,math.huge));
+		local Size2 = TextService:GetTextSize(NotifyContent.Text,NotifyContent.TextSize,Enum.Font.GothamBold,Vector2.new(math.huge,math.huge));
 
 		local MainSize = math.max(Size1.X , Size2.X);
 
@@ -6661,7 +6661,7 @@ function NeverLose:CreateLogger()
 		Icon.TextTransparency = 1--0.250
 		Icon.TextWrapped = true
 
-		local size = TextService:GetTextSize(LogContent.Text,LogContent.TextSize,LogContent.Font,Vector2.new(math.huge,math.huge));
+		local size = TextService:GetTextSize(LogContent.Text,LogContent.TextSize,Enum.Font.GothamBold,Vector2.new(math.huge,math.huge));
 
 		NeverLose.PlayAnimate(LogFrame , SlowyTween , {
 			Size = UDim2.new(0, size.X + 35, 0, 20),
@@ -6846,7 +6846,7 @@ function NeverLose:CreateIndicator()
 		Content.TextXAlignment = Enum.TextXAlignment.Left
 
 		Indicator.Update = LPH_NO_VIRTUALIZE(function()
-			local text = TextService:GetTextSize(Content.Text,Content.TextSize , Content.Font , Vector2.new(math.huge,math.huge));
+			local text = TextService:GetTextSize(Content.Text,Content.TextSize , Enum.Font.GothamBold , Vector2.new(math.huge,math.huge));
 
 			NeverLose.PlayAnimate(IndicatorItem , SlowyTween , {
 				Size = UDim2.new(0, text.X + 60, 0, 40);
