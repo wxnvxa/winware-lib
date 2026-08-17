@@ -1,32 +1,63 @@
-# WinWare Lib
+# WinWare Figma UI
 
-Modular source distribution of the WinWare UI library.
+Native Roblox/Luau port of the WinWare Figma interface. The library ships a single file with the window, tabs, sections, controls, config helpers and drag behavior.
 
-The original public contract is preserved: the built output returns `function(env)`, then exposes the legacy `Library` table and UI helpers through the returned table. It expects the same `env` contract as `ww/Library.lua` did.
+The default window is `834x534`, the original `1250x800` Figma surface reduced by 1.5. It does not automatically upscale to the viewport.
 
-## Layout
-
-- `src/fragments/` contains ordered source fragments.
-- `build/fragments.json` is the single source of truth for fragment order.
-- `dist/main.lua` is the executor-ready bundle.
-- `build/extract-legacy.ps1` is the one-time extraction script used to split the legacy `ww/Library.lua` source without changing behavior.
-
-## Commands
-
-```powershell
-npm run build
-npm run check
-npm test
-```
-
-`npm run check` uses the local Luau compiler when available, otherwise the compiler from the sibling `winware` workspace.
-
-## WinWare Figma build
-
-The NeverLose-based WinWare Figma port and its standalone example are available in [`figma/`](figma/README.md).
+## Run the complete example
 
 ```luau
 loadstring(game:HttpGet(
-	"https://raw.githubusercontent.com/wxnvxa/winware-lib/main/figma/example.luau"
+	"https://raw.githubusercontent.com/wxnvxa/winware-lib/main/example.luau"
 ))()
 ```
+
+## Load only the library
+
+```luau
+local WinWare = loadstring(game:HttpGet(
+	"https://raw.githubusercontent.com/wxnvxa/winware-lib/main/winware.luau"
+))()
+```
+
+## API example
+
+```luau
+local window = WinWare:CreateWindow({
+    Name = "WINWARE",
+    Content = "",
+    Size = WinWare.Scales.Default,
+    Keybind = "Insert",
+})
+
+-- Avatar and username come from Roblox. Omit Lifetime for "Never".
+window:SetAccount({ Lifetime = true })
+
+window:AddTabLabel("MODULES")
+local combat = window:AddTab({ Name = "Combat", Icon = "sword" })
+local ragebot = combat:AddSection({ Name = "RAGEBOT", Position = "left" })
+
+ragebot:AddLabel("Enabled"):AddToggle({
+    Default = false,
+    Flag = "Ragebot.Enabled",
+})
+
+ragebot:AddLabel("FOV"):AddSlider({
+    Default = 90,
+    Min = 0,
+    Max = 180,
+    Size = 233,
+    Flag = "Ragebot.FOV",
+})
+
+ragebot:AddLabel("Target"):AddDropdown({
+    Default = "Head",
+    Values = { "Head", "Torso", "Closest" },
+    Size = 100,
+    Flag = "Ragebot.Target",
+})
+```
+
+Controls with a `Flag` are available through `WinWare.Flags[flag]` and retain the base `GetValue`/`SetValue` methods.
+
+The upstream copyright and MIT license are retained in `LICENSE`.

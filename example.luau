@@ -1,6 +1,6 @@
 -- Standalone remote example. The environment must provide loadstring and game:HttpGet.
 local WinWare = loadstring(game:HttpGet(
-	"https://raw.githubusercontent.com/wxnvxa/winware-lib/main/figma/winware.luau"
+	"https://raw.githubusercontent.com/wxnvxa/winware-lib/main/winware.luau"
 ))()
 
 local window = WinWare:CreateWindow({
