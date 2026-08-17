@@ -3272,18 +3272,18 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 
 		Keybind.Name = WinWare.RandomString();
 		Keybind.Parent = Handler
-		Keybind.BackgroundColor3 = WinWare.PopupSurfaceTopColor
+		Keybind.BackgroundColor3 = Color3.fromRGB(11, 11, 11)
 		Keybind.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Keybind.BorderSizePixel = 0
 		Keybind.ClipsDescendants = true
-		Keybind.Size = UDim2.new(0, 48, 0, 28)
+		Keybind.Size = UDim2.new(0, 46, 0, 30)
 		Keybind.ZIndex = ZINdex + 13
 		Keybind.LayoutOrder = -(#Handler:GetChildren() + 5);
 
-		UICorner.CornerRadius = UDim.new(0, 8)
+		UICorner.CornerRadius = UDim.new(0, 9)
 		UICorner.Parent = Keybind
 
-		UIStroke.Transparency = WinWare.PopupStrokeTransparency
+		UIStroke.Transparency = 1
 		UIStroke.Color = WinWare.PopupStrokeColor
 		UIStroke.Parent = Keybind
 
@@ -3302,7 +3302,7 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 		ValueLabel.Text = WinWare:KeyCodeToStr(Config.Default or "None")
 		ValueLabel.TextColor3 = Color3.fromRGB(206, 206, 206)
 		ValueLabel.TextSize = 13.000
-		ValueLabel.TextTransparency = 0.050
+		ValueLabel.TextTransparency = 0
 
 		KeybindLib.SetRender = LPH_NO_VIRTUALIZE(function(value)
 			if value then
@@ -3311,11 +3311,11 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 				})
 
 				WinWare.PlayAnimate(UIStroke,SlowyTween, {
-					Transparency = 0.920
+					Transparency = 1
 				})
 
 				WinWare.PlayAnimate(ValueLabel,SlowyTween, {
-					TextTransparency = 0.050
+					TextTransparency = 0
 				})
 			else
 				WinWare.PlayAnimate(Keybind,SlowyTween, {
@@ -3336,7 +3336,7 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 			local size = TextService:GetTextSize(ValueLabel.Text,ValueLabel.TextSize,WinWare.TextMetricFont,Vector2.new(math.huge,math.huge));
 
 			WinWare.PlayAnimate(Keybind , SlowyTween , {
-				Size = UDim2.new(0, math.max(48, size.X + 18), 0, 28)
+				Size = UDim2.new(0, math.max(46, size.X + 20), 0, 30)
 			})
 		end;
 
@@ -3435,10 +3435,10 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 		TextInput.ZIndex = ZINdex + 13
 		TextInput.LayoutOrder = -(#Handler:GetChildren() + 5);
 
-		UICorner.CornerRadius = UDim.new(0, 8)
+		UICorner.CornerRadius = UDim.new(0, 9)
 		UICorner.Parent = TextInput
 
-		UIStroke.Transparency = WinWare.PopupStrokeTransparency
+		UIStroke.Transparency = 1
 		UIStroke.Color = WinWare.PopupStrokeColor
 		UIStroke.Parent = TextInput
 
@@ -3457,7 +3457,7 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 		TextBox.Text = tostring(Config.Default)
 		TextBox.TextColor3 = Color3.fromRGB(206, 206, 206)
 		TextBox.TextSize = 14.000
-		TextBox.TextTransparency = 0.050
+		TextBox.TextTransparency = 0
 		TextBox.TextXAlignment = Enum.TextXAlignment.Left
 
 		TextBoxLib.SetRender = LPH_NO_VIRTUALIZE(function(value)
@@ -3467,7 +3467,7 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 				})	
 
 				WinWare.PlayAnimate(UIStroke , SlowyTween ,{
-					Transparency = 0.920
+					Transparency = 1
 				})	
 
 				WinWare.PlayAnimate(TextBox , SlowyTween ,{
@@ -6295,7 +6295,7 @@ function WinWare:CreateWindow(Config)
 		TextBox.Text = ""
 		TextBox.TextColor3 = Color3.fromRGB(206, 206, 206)
 		TextBox.TextSize = 14.000
-		TextBox.TextTransparency = 0.050
+		TextBox.TextTransparency = 0
 		TextBox.TextXAlignment = Enum.TextXAlignment.Left
 
 		LoadConfig.Name = WinWare.RandomString();
