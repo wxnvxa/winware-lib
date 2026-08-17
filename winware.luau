@@ -6781,6 +6781,8 @@ function WinWare:CreateWindow(Config)
 		Watermark.Size = UDim2.new(0, 120, 0, 30)
 		Watermark.ZIndex = 16
 
+		WinWare.ApplyPopupSurface(Watermark , 0.100);
+
 		UICorner.CornerRadius = UDim.new(0, 25)
 		UICorner.Parent = Watermark
 
@@ -6824,7 +6826,7 @@ function WinWare:CreateWindow(Config)
 
 			if value then
 				WinWare.PlayAnimate(Watermark,SlowyTween , {
-					BackgroundTransparency = 0.200
+					BackgroundTransparency = 0.100
 				})
 
 				Shadow:Render(true);
@@ -7047,6 +7049,8 @@ function WinWare:CreateNotification()
 		NotifyFrame.Position = UDim2.new(0, 750, 0, 0)
 		NotifyFrame.Size = UDim2.new(0, 220, 0, 55)
 		NotifyFrame.ZIndex = 130
+
+		WinWare.ApplyPopupSurface(NotifyFrame , 0.100);
 
 		UICorner.CornerRadius = UDim.new(0, 10)
 		UICorner.Parent = NotifyFrame
@@ -7381,8 +7385,10 @@ function WinWare:CreateIndicator()
 		local Shadow = WinWare:CreateShadow(IndicatorItem);
 
 		IndicatorItem.Name = WinWare.RandomString();
-		IndicatorItem.BackgroundColor3 = Color3.fromRGB(8, 8, 13)
+		IndicatorItem.BackgroundColor3 = WinWare.PopupSurfaceColor
 		IndicatorItem.BackgroundTransparency = 1
+
+		WinWare.ApplyPopupSurface(IndicatorItem , 1);
 		IndicatorItem.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		IndicatorItem.BorderSizePixel = 0
 		IndicatorItem.ClipsDescendants = true
@@ -7468,7 +7474,7 @@ function WinWare:CreateIndicator()
 
 			if value then
 				WinWare.PlayAnimate(IndicatorItem , SlowyTween , {
-					BackgroundTransparency = 0.200
+					BackgroundTransparency = 0.100
 				});
 
 				WinWare.PlayAnimate(Line , SlowyTween , {
