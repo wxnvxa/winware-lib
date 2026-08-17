@@ -223,33 +223,36 @@ NeverLose.MainColor = Color3.fromRGB(11, 11, 11);
 NeverLose.RegisiteryColor = {};
 NeverLose.NameRegisitry = {};
 NeverLose.IsMosueOverOtherFrame = false;
-NeverLose.GlobalLogo = "rbxassetid://120358385035996";
+-- WinWare owns the product mark.  Keep a neutral fallback until the executor
+-- loads the exact PNG from the public repository below.
+NeverLose.GlobalLogo = "rbxassetid://0";
 NeverLose.ImageColorMapping = "rbxassetid://4155801252";
 
 if getcustomasset then
-	local link = "https://github.com/4lpaca-pin/NeverLose/blob/main/assets/%s?raw=true";
-	local dir = 'NLAssets';
+	local winwareLink = "https://raw.githubusercontent.com/wxnvxa/winware-lib/main/assets/%s";
+	local legacyLink = "https://github.com/4lpaca-pin/NeverLose/blob/main/assets/%s?raw=true";
+	local dir = 'WinWareAssets';
 
 	if not isfolder(dir) then
 		makefolder(dir);
 	end;
 
 	pcall(function()
-		if not isfile(dir..'/'..'logo.png') then
-			local byte = game:HttpGet(string.format(link,'logo.png'));
+		if not isfile(dir..'/winware.png') then
+			local byte = game:HttpGet(string.format(winwareLink,'winware.png'));
 
-			writefile(dir..'/'..'logo.png' , byte);
+			writefile(dir..'/winware.png' , byte);
 			task.wait();
 		end;
 
-		if isfile(dir..'/'..'logo.png') then
-			NeverLose.GlobalLogo = getcustomasset(dir..'/'..'logo.png')
+		if isfile(dir..'/winware.png') then
+			NeverLose.GlobalLogo = getcustomasset(dir..'/winware.png')
 		end;
 	end);
 
 	pcall(function()
 		if not isfile(dir..'/'..'saturation_value_gradient.png') then
-			local byte = game:HttpGet(string.format(link,'saturation_value_gradient.png'));
+			local byte = game:HttpGet(string.format(legacyLink,'saturation_value_gradient.png'));
 
 			writefile(dir..'/'..'saturation_value_gradient.png' , byte);
 			task.wait();
@@ -951,112 +954,212 @@ function NeverLose:EnableTextShimmer(Label: TextLabel, Gradient: UIGradient, Opt
 
 	Options = Options or {};
 
-	local BaseColor = Options.BaseColor or Color3.fromRGB(27, 39, 88);
-	local EndColor = Options.EndColor or Color3.fromRGB(0, 86, 255);
-	local PeakColors = Options.PeakColors or { Color3.fromRGB(0, 86, 255), Color3.fromRGB(255, 255, 255) };
-	local BandCount = math.clamp(Options.BandCount or 0.6, 0.25, 3);
-	local BandWidth = math.clamp(Options.BandWidth or 0.7, 0.05, 1);
-	local SweepTime = math.max(Options.SweepTime or 1.5, 0.1);
+	local BaseColor = Options.BaseColor;
+	local BaseBrightness = math.clamp(Options.BaseBrightness or 0.4, 0, 1);
+	local PeakColors = Options.PeakColors;
+	local ColorMode = Options.ColorMode or "flow";
+	local BandCountConfig = Options.BandCount or 0.6;
+	local BandWidth = Options.BandWidth or 0.7;
+	local SweepTime = Options.SweepTime or 1.5;
+	local Rotation = Options.Rotation or 0;
+	local FitToText = Options.FitToText ~= false;
+
 	local MaxKeypoints = 20;
+	local MaxBandsOnFrame = 5;
 	local Epsilon = 1e-3;
+	local OriginalColor = Label.TextColor3;
+	local HasPalette = PeakColors ~= nil and #PeakColors > 0;
+	local Base;
+
+	if HasPalette or BaseColor then
+		Label.TextColor3 = Color3.new(1, 1, 1);
+		Base = BaseColor or Color3.new(
+			OriginalColor.R * BaseBrightness,
+			OriginalColor.G * BaseBrightness,
+			OriginalColor.B * BaseBrightness
+		);
+
+		if not HasPalette then
+			PeakColors = { Color3.new(1, 1, 1) };
+		end;
+	else
+		Base = Color3.new(BaseBrightness, BaseBrightness, BaseBrightness);
+		PeakColors = { Color3.new(1, 1, 1) };
+	end;
+
+	local PaletteCount = #PeakColors;
+	local FlowMode = ColorMode == "flow";
+	local SpreadMode = ColorMode == "spread";
+	local Animated = SweepTime > 0;
+
+	local FlowColors = table.clone(PeakColors);
+	if FlowMode and Animated and #FlowColors > 1 then
+		table.insert(FlowColors, FlowColors[1]);
+	end;
+
+	local FlowOffsets = {};
+	for index = 1, #FlowColors do
+		FlowOffsets[index] = (#FlowColors > 1) and (index - 1) / (#FlowColors - 1) or 0;
+	end;
+
+	local BandCount;
+	if FlowMode then
+		BandCount = math.clamp(BandCountConfig, 0.25, 3);
+	else
+		BandCount = math.clamp(math.floor(BandCountConfig), 1, 3);
+	end;
+
+	local MinPeriod = FlowMode
+		and (#FlowOffsets / (MaxKeypoints - 2))
+		or (1 / MaxBandsOnFrame);
+
+	Gradient.Rotation = Rotation;
+
 	local phase = 0;
-	local lastPhase, lastPeriod, lastHalfWidth;
+	local wraps = 0;
 
 	local function smoothstep(value)
 		return value * value * (3 - 2 * value);
 	end;
 
-	local function baseAt(position)
-		return BaseColor:Lerp(EndColor, math.clamp(position, 0, 1));
-	end;
-
-	local function peakAt(index)
-		local count = #PeakColors;
-		if count == 0 then
-			return EndColor;
+	local function sampleList(List, value)
+		local count = #List;
+		if count == 1 then
+			return List[1];
 		end;
 
-		return PeakColors[((index % count) + count) % count + 1];
+		local scaled = math.clamp(value, 0, 1) * (count - 1);
+		local index = math.floor(scaled);
+		local from = List[index + 1];
+		local to = List[math.min(index + 2, count)];
+		return from:Lerp(to, scaled - index);
 	end;
 
 	local function colorAt(position, period, halfWidth)
-		local bandIndex = math.floor((position - phase) / period + 0.5);
-		local center = phase + bandIndex * period;
-		local distance = math.abs(position - center);
-		local color = baseAt(position);
-
-		if distance < halfWidth then
-			local amount = smoothstep(1 - distance / halfWidth);
-			color = color:Lerp(peakAt(bandIndex), amount);
+		if FlowMode then
+			return sampleList(FlowColors, ((position - phase) % period) / period);
 		end;
 
-		return color;
+		local index = math.floor((position - phase) / period + 0.5);
+		local center = phase + index * period;
+		local distance = math.abs(position - center);
+
+		if distance >= halfWidth then
+			return Base;
+		end;
+
+		local Peak;
+		if SpreadMode then
+			Peak = sampleList(PeakColors, (position - center + halfWidth) / (halfWidth * 2));
+		else
+			Peak = PeakColors[(index - wraps) % PaletteCount + 1];
+		end;
+
+		return Base:Lerp(Peak, smoothstep(1 - distance / halfWidth));
 	end;
 
-	local function buildSequence(period, halfWidth)
-		local positions = {};
+	local OffsetCache = {};
+	local function offsetsFor(count)
+		local cached = OffsetCache[count];
+		if cached then
+			return cached;
+		end;
+
+		local List = {};
+		for index = 0, count - 1 do
+			List[index + 1] = -1 + 2 * index / (count - 1);
+		end;
+
+		OffsetCache[count] = List;
+		return List;
+	end;
+
+	local Times = {};
+	local function build(period, halfWidth, samples, scale, anchorShift)
+		table.clear(Times);
+
 		local first = math.floor(-phase / period) - 1;
 		local last = math.ceil((1 - phase) / period) + 1;
 
-		for bandIndex = first, last do
-			local center = phase + bandIndex * period;
-			for _, offset in next, { -1, 0, 1 } do
-				local position = center + offset * halfWidth;
+		for index = first, last do
+			local anchor = phase + index * period + anchorShift;
+			for _, offset in samples do
+				local position = anchor + offset * scale;
 				if position > Epsilon and position < 1 - Epsilon then
-					table.insert(positions, position);
+					table.insert(Times, position);
 				end;
 			end;
 		end;
 
-		table.sort(positions);
+		table.sort(Times);
 
-		local keypoints = {
+		local Keypoints = {
 			ColorSequenceKeypoint.new(0, colorAt(0, period, halfWidth)),
 		};
 		local previous = 0;
 
-		for _, position in next, positions do
-			if #keypoints >= MaxKeypoints - 1 then
+		for _, position in Times do
+			if #Keypoints >= MaxKeypoints - 1 then
 				break;
 			end;
 
 			if position - previous >= Epsilon then
-				table.insert(keypoints, ColorSequenceKeypoint.new(position, colorAt(position, period, halfWidth)));
+				table.insert(Keypoints, ColorSequenceKeypoint.new(position, colorAt(position, period, halfWidth)));
 				previous = position;
 			end;
 		end;
 
-		table.insert(keypoints, ColorSequenceKeypoint.new(1, colorAt(1, period, halfWidth)));
-		return ColorSequence.new(keypoints);
+		table.insert(Keypoints, ColorSequenceKeypoint.new(1, colorAt(1, period, halfWidth)));
+		return ColorSequence.new(Keypoints);
 	end;
 
-	Label.TextColor3 = Color3.new(1, 1, 1);
 	local RenderSignal = RunService.PreRender or RunService.RenderStepped;
 	if not RenderSignal then
 		return;
 	end;
 
+	local lastPhase, lastPeriod, lastHalfWidth;
 	NeverLose:AddSignal(RenderSignal:Connect(function(deltaTime)
 		if not Label.Parent or not Label.Visible then
 			return;
 		end;
 
-		local textWidth = math.max(Label.TextBounds.X, 1);
-		local labelWidth = math.max(Label.AbsoluteSize.X, 1);
-		local span = Options.FitToText == false and 1 or math.clamp(textWidth / labelWidth, 0.05, 1);
-		local period = math.max(span / BandCount, 0.08);
-		local halfWidth = math.max(period * 0.5 * BandWidth, 1e-4);
+		local span = 1;
+		if FitToText then
+			span = math.clamp(Label.TextBounds.X / math.max(Label.AbsoluteSize.X, 1), 0.05, 1);
+		end;
 
-		phase = (phase + (span / SweepTime) * deltaTime) % period;
+		local period = math.max(span / BandCount, MinPeriod);
+		local halfWidth = math.max(period * 0.5 * math.clamp(BandWidth, 0.05, 1), 1e-4);
+
+		if Animated then
+			phase += (span / SweepTime) * deltaTime;
+			while phase >= period do
+				phase -= period;
+				wraps = (wraps + 1) % PaletteCount;
+			end;
+		else
+			phase = (1 - span) * 0.5;
+		end;
+
 		if phase == lastPhase and period == lastPeriod and halfWidth == lastHalfWidth then
 			return;
 		end;
 
 		lastPhase, lastPeriod, lastHalfWidth = phase, period, halfWidth;
-		Gradient.Color = buildSequence(period, halfWidth);
+
+		local samples, scale, anchorShift;
+		if FlowMode then
+			samples, scale, anchorShift = FlowOffsets, period, 0;
+		else
+			local bandsOnFrame = math.ceil(1 / period) + 1;
+			samples = offsetsFor(math.clamp(math.floor((MaxKeypoints - 2) / bandsOnFrame), 3, 9));
+			scale, anchorShift = halfWidth, 0;
+		end;
+
+		Gradient.Color = build(period, halfWidth, samples, scale, anchorShift);
 	end));
 end;
-
 function NeverLose:EnableOverflowMarquee(Label: TextLabel, Options)
 	if not Label or not Label:IsA("TextLabel") or Label:GetAttribute("WinWareMarqueeEnabled") then
 		return;
@@ -1078,18 +1181,18 @@ function NeverLose:EnableOverflowMarquee(Label: TextLabel, Options)
 	local Hovered = false;
 	local Active = false;
 	local ActiveTween;
-	local MarqueeLabel;
+	local MarqueeViewport;
+	local OriginalParent;
+	local OriginalPosition;
 	local OriginalSize;
-	local OriginalClipsDescendants;
-	local VisibleTransparency = Label.TextTransparency;
-	local InternalTransparencyChange = false;
+	local OriginalAnchorPoint;
+	local OriginalLayoutOrder;
+	local OriginalZIndex;
+	local OriginalAutomaticSize;
+	local OriginalTextTruncate;
+	local OriginalTextWrapped;
+	local OriginalTextXAlignment;
 	local StartGeneration = 0;
-
-	local function SetOriginalTransparency(Value)
-		InternalTransparencyChange = true;
-		Label.TextTransparency = Value;
-		InternalTransparencyChange = false;
-	end;
 
 	local function GetVisibleWidth()
 		if Options.GetVisibleWidth then
@@ -1142,25 +1245,34 @@ function NeverLose:EnableOverflowMarquee(Label: TextLabel, Options)
 			ActiveTween = nil;
 		end;
 
-		if MarqueeLabel then
-			MarqueeLabel:Destroy();
-			MarqueeLabel = nil;
-		end;
-
-		SetOriginalTransparency(VisibleTransparency);
-		Label.ClipsDescendants = OriginalClipsDescendants;
-
-		if OriginalSize then
+		if OriginalParent and OriginalParent.Parent then
+			Label.Parent = OriginalParent;
+			Label.Position = OriginalPosition;
 			Label.Size = OriginalSize;
-			OriginalSize = nil;
+			Label.AnchorPoint = OriginalAnchorPoint;
+			Label.LayoutOrder = OriginalLayoutOrder;
+			Label.ZIndex = OriginalZIndex;
+			Label.AutomaticSize = OriginalAutomaticSize;
+			Label.TextTruncate = OriginalTextTruncate;
+			Label.TextWrapped = OriginalTextWrapped;
+			Label.TextXAlignment = OriginalTextXAlignment;
 		end;
+
+		if MarqueeViewport then
+			MarqueeViewport:Destroy();
+			MarqueeViewport = nil;
+		end;
+
+		OriginalParent = nil;
+		OriginalPosition = nil;
+		OriginalSize = nil;
 	end;
 
 	local function Start()
 		Stop();
 		local Generation = StartGeneration;
 
-		if not Hovered or not Label.Parent or not Label.Visible or Label.Text == "" then
+		if not Hovered or not Label.Parent or not Label.Visible or Label.Text == "" or Label.TextTransparency >= 0.999 then
 			return;
 		end;
 
@@ -1170,48 +1282,60 @@ function NeverLose:EnableOverflowMarquee(Label: TextLabel, Options)
 			return;
 		end;
 
+		OriginalParent = Label.Parent;
+		OriginalPosition = Label.Position;
 		OriginalSize = Label.Size;
+		OriginalAnchorPoint = Label.AnchorPoint;
+		OriginalLayoutOrder = Label.LayoutOrder;
+		OriginalZIndex = Label.ZIndex;
+		OriginalAutomaticSize = Label.AutomaticSize;
+		OriginalTextTruncate = Label.TextTruncate;
+		OriginalTextWrapped = Label.TextWrapped;
+		OriginalTextXAlignment = Label.TextXAlignment;
+
+		local viewportSize = OriginalSize;
 		if Label.AbsoluteSize.X <= 4 then
-			Label.Size = UDim2.new(0, visibleWidth, OriginalSize.Y.Scale, OriginalSize.Y.Offset);
+			viewportSize = UDim2.new(0, visibleWidth, OriginalSize.Y.Scale, OriginalSize.Y.Offset);
 		end;
 
-		OriginalClipsDescendants = Label.ClipsDescendants;
-		VisibleTransparency = Label.TextTransparency;
-		Label.ClipsDescendants = true;
+		MarqueeViewport = Instance.new("Frame");
+		MarqueeViewport.Name = NeverLose.RandomString();
+		MarqueeViewport.BackgroundTransparency = 1;
+		MarqueeViewport.BorderSizePixel = 0;
+		MarqueeViewport.ClipsDescendants = true;
+		MarqueeViewport.Position = OriginalPosition;
+		MarqueeViewport.Size = viewportSize;
+		MarqueeViewport.AnchorPoint = OriginalAnchorPoint;
+		MarqueeViewport.LayoutOrder = OriginalLayoutOrder;
+		MarqueeViewport.ZIndex = OriginalZIndex;
+		MarqueeViewport.Parent = OriginalParent;
 
-		MarqueeLabel = Label:Clone();
-		MarqueeLabel:SetAttribute("WinWareMarqueeEnabled", true);
-		MarqueeLabel.Name = NeverLose.RandomString();
-		MarqueeLabel.Active = false;
-		MarqueeLabel.AnchorPoint = Vector2.zero;
-		MarqueeLabel.AutomaticSize = Enum.AutomaticSize.None;
-		MarqueeLabel.BackgroundTransparency = 1;
-		MarqueeLabel.Position = UDim2.fromOffset(0, 0);
-		MarqueeLabel.Size = UDim2.fromOffset(textWidth, math.max(Label.AbsoluteSize.Y, Label.TextSize + 2));
-		MarqueeLabel.TextScaled = false;
-		MarqueeLabel.TextTransparency = VisibleTransparency;
-		MarqueeLabel.TextTruncate = Enum.TextTruncate.None;
-		MarqueeLabel.TextWrapped = false;
-		MarqueeLabel.TextXAlignment = Enum.TextXAlignment.Left;
-		MarqueeLabel.ZIndex = Label.ZIndex + 1;
-		MarqueeLabel.Parent = Label;
+		Label.Parent = MarqueeViewport;
+		Label.Active = false;
+		Label.AnchorPoint = Vector2.zero;
+		Label.AutomaticSize = Enum.AutomaticSize.None;
+		Label.Position = UDim2.fromOffset(0, 0);
+		Label.Size = UDim2.fromOffset(textWidth, math.max(Label.AbsoluteSize.Y, Label.TextSize + 2));
+		Label.TextTruncate = Enum.TextTruncate.None;
+		Label.TextWrapped = false;
+		Label.TextXAlignment = Enum.TextXAlignment.Left;
+		Label.ZIndex = OriginalZIndex + 1;
 
 		Active = true;
-		SetOriginalTransparency(1);
 
 		local overflow = textWidth - visibleWidth;
 		local duration = math.clamp(overflow / 22, 2.4, 8);
 
 		task.spawn(function()
-			while Active and Hovered and MarqueeLabel and MarqueeLabel.Parent do
+			while Active and Hovered and Label.Parent == MarqueeViewport do
 				local OutTween;
 				local OutSuccess = pcall(function()
-					OutTween = TweenService:Create(MarqueeLabel, TweenInfo.new(duration, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+					OutTween = TweenService:Create(Label, TweenInfo.new(duration, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
 						Position = UDim2.fromOffset(-overflow, 0),
 					});
 				end);
 
-				if not OutSuccess or not OutTween or not Active or not Hovered or not MarqueeLabel or not MarqueeLabel.Parent then
+				if not OutSuccess or not OutTween or not Active or not Hovered or Label.Parent ~= MarqueeViewport then
 					break;
 				end;
 
@@ -1219,24 +1343,24 @@ function NeverLose:EnableOverflowMarquee(Label: TextLabel, Options)
 				OutTween:Play();
 				OutTween.Completed:Wait();
 
-				if not Active or not Hovered or not MarqueeLabel or not MarqueeLabel.Parent then
+				if not Active or not Hovered or Label.Parent ~= MarqueeViewport then
 					break;
 				end;
 
 				task.wait(0.45);
 
-				if not Active or not Hovered or not MarqueeLabel or not MarqueeLabel.Parent then
+				if not Active or not Hovered or Label.Parent ~= MarqueeViewport then
 					break;
 				end;
 
 				local BackTween;
 				local BackSuccess = pcall(function()
-					BackTween = TweenService:Create(MarqueeLabel, TweenInfo.new(duration, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+					BackTween = TweenService:Create(Label, TweenInfo.new(duration, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
 						Position = UDim2.fromOffset(0, 0),
 					});
 				end);
 
-				if not BackSuccess or not BackTween or not Active or not Hovered or not MarqueeLabel or not MarqueeLabel.Parent then
+				if not BackSuccess or not BackTween or not Active or not Hovered or Label.Parent ~= MarqueeViewport then
 					break;
 				end;
 
@@ -1250,18 +1374,6 @@ function NeverLose:EnableOverflowMarquee(Label: TextLabel, Options)
 			end;
 		end);
 	end;
-
-	NeverLose:AddSignal(Label:GetPropertyChangedSignal("TextTransparency"):Connect(function()
-		if InternalTransparencyChange then
-			return;
-		end;
-
-		VisibleTransparency = Label.TextTransparency;
-		if Active and MarqueeLabel then
-			MarqueeLabel.TextTransparency = VisibleTransparency;
-			SetOriginalTransparency(1);
-		end;
-	end));
 
 	NeverLose:AddSignal(Label:GetPropertyChangedSignal("Text"):Connect(function()
 		if Hovered then
@@ -1295,10 +1407,7 @@ local function RegisterOverflowMarquee(Descendant)
 
 	task.defer(function()
 		if Descendant.Parent and not Descendant:GetAttribute("WinWareMarqueeEnabled") then
-			local HoverTarget = Descendant;
-			if Descendant.AbsoluteSize.X <= 4 and Descendant.Parent:IsA("GuiObject") then
-				HoverTarget = Descendant.Parent;
-			end;
+			local HoverTarget = Descendant.Parent:IsA("GuiObject") and Descendant.Parent or Descendant;
 
 			NeverLose:EnableOverflowMarquee(Descendant, {
 				HoverTarget = HoverTarget,
@@ -4836,7 +4945,6 @@ function NeverLose:CreateWindow(Config)
 	WindowNameGradient.Rotation = 0
 	NeverLose:EnableTextShimmer(WindowName, WindowNameGradient, {
 		BaseColor = Color3.fromRGB(27, 39, 88),
-		EndColor = Color3.fromRGB(0, 86, 255),
 		PeakColors = { Color3.fromRGB(0, 86, 255), Color3.fromRGB(255, 255, 255) },
 		BandCount = 0.6,
 		BandWidth = 0.7,
