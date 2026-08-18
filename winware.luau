@@ -5825,8 +5825,8 @@ function WinWare:CreateWindow(Config)
 			end))
 
 			local SectionPadding = Instance.new("UIPadding")
-			SectionPadding.PaddingTop = UDim.new(0, 6)
-			SectionPadding.PaddingBottom = UDim.new(0, 6)
+			SectionPadding.PaddingTop = UDim.new(0, 0)
+			SectionPadding.PaddingBottom = UDim.new(0, 0)
 			SectionPadding.Parent = SectionHandler
 			UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
@@ -5839,7 +5839,7 @@ function WinWare:CreateWindow(Config)
 					})
 				else
 					WinWare.PlayAnimate(SectionFrame , VSlowTween , {
-						Size = UDim2.new(1, -5, 0, UIListLayout.AbsoluteContentSize.Y + 36)
+						Size = UDim2.new(1, -5, 0, UIListLayout.AbsoluteContentSize.Y + 22)
 					})
 				end;
 			end));
