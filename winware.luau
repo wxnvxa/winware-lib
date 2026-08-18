@@ -5783,7 +5783,7 @@ function WinWare:CreateWindow(Config)
 			SectionHandler.BorderSizePixel = 0
 			SectionHandler.ClipsDescendants = true
 			SectionHandler.Position = UDim2.new(0.5, 0, 0, 20)
-			SectionHandler.Size = UDim2.new(1, -4, 1, -22)
+			SectionHandler.Size = UDim2.new(1, -4, 0, 0)
 			SectionHandler.ZIndex = 9
 
 			UIStroke.Transparency = 0.950
@@ -5833,13 +5833,23 @@ function WinWare:CreateWindow(Config)
 			UIListLayout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(LPH_NO_VIRTUALIZE(function()
 
 
-				if UIListLayout.AbsoluteContentSize.Y <= 1 then
+				local ContentHeight = UIListLayout.AbsoluteContentSize.Y;
+
+				if ContentHeight <= 1 then
 					WinWare.PlayAnimate(SectionFrame , VSlowTween , {
 						Size = UDim2.new(1, -5, 0, 0)
 					})
+
+					WinWare.PlayAnimate(SectionHandler , VSlowTween , {
+						Size = UDim2.new(1, -4, 0, 0)
+					})
 				else
 					WinWare.PlayAnimate(SectionFrame , VSlowTween , {
-						Size = UDim2.new(1, -5, 0, UIListLayout.AbsoluteContentSize.Y + 22)
+						Size = UDim2.new(1, -5, 0, ContentHeight + 22)
+					})
+
+					WinWare.PlayAnimate(SectionHandler , VSlowTween , {
+						Size = UDim2.new(1, -4, 0, ContentHeight)
 					})
 				end;
 			end));
