@@ -2141,7 +2141,11 @@ function WinWare:CreateColorPicker(HandleFrame: Frame)
 
 	ColorPickerLib.SetRender = LPH_NO_VIRTUALIZE(function(value)
 		if value then
-			ColorPickerHandler.Position = UDim2.new(0,HandleFrame.AbsolutePosition.X + 20 , 0 ,HandleFrame.AbsolutePosition.Y + 75);
+			local Viewport = WinWare.ScreenGui.AbsoluteSize;
+			local TargetX = math.clamp((HandleFrame.AbsolutePosition.X + HandleFrame.AbsoluteSize.X) - 200 , 10 , math.max(10 , Viewport.X - 210));
+			local TargetY = math.clamp(HandleFrame.AbsolutePosition.Y + HandleFrame.AbsoluteSize.Y + 8 , 10 , math.max(10 , Viewport.Y - 250));
+
+			ColorPickerHandler.Position = UDim2.new(0, TargetX, 0, TargetY);
 
 			WinWare.PlayAnimate(ColorPickerHandler,SlowyTween , {
 				BackgroundTransparency = 0.100
@@ -2983,7 +2987,7 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 		ColorPicker.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ColorPicker.BorderSizePixel = 0
 		ColorPicker.ClipsDescendants = true
-		ColorPicker.Size = UDim2.new(0, 18, 0, 18)
+		ColorPicker.Size = UDim2.new(0, 22, 0, 22)
 		ColorPicker.ZIndex = ZINdex + 13
 		ColorPicker.LayoutOrder = -(#Handler:GetChildren() + 5);
 
@@ -4181,7 +4185,7 @@ function WinWare:RegisiterItem(Frame: Frame , Signel)
 		LineFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		LineFrame.BorderSizePixel = 0
 		LineFrame.Position = UDim2.new(0.5, 0, 1, 0)
-		LineFrame.Size = UDim2.new(1, -30, 0, 2)
+		LineFrame.Size = UDim2.new(1, -20, 0, 2)
 		LineFrame.ZIndex = LayerIndex + 11
 
 		BasedHandler.Name = WinWare.RandomString();
@@ -4298,21 +4302,34 @@ function WinWare:RegisiterItem(Frame: Frame , Signel)
 		});
 
 		local Button = {};
+		local ButtonRow = Instance.new("Frame")
 		local ButtonFrame = Instance.new("Frame")
 		local BasedLabel = Instance.new("TextLabel")
 		local LineFrame = Instance.new("Frame")
 		local UICorner = Instance.new("UICorner")
 		local Icon = Instance.new("TextLabel")
 
-		WinWare:AddQuery(ButtonFrame , Config.Name);
+		WinWare:AddQuery(ButtonRow , Config.Name);
+
+		ButtonRow.Name = WinWare.RandomString();
+		ButtonRow.Parent = Frame
+		ButtonRow.BackgroundColor3 = Color3.fromRGB(21, 21, 21)
+		ButtonRow.BackgroundTransparency = 1.000
+		ButtonRow.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		ButtonRow.BorderSizePixel = 0
+		ButtonRow.Size = UDim2.new(1, 0, 0, 44)
+		ButtonRow.ZIndex = LayerIndex + 8
+		ButtonRow:SetAttribute("ControlRow" , true)
 
 		ButtonFrame.Name = WinWare.RandomString();
-		ButtonFrame.Parent = Frame
-		ButtonFrame.BackgroundColor3 = Color3.fromRGB(21, 21, 21)
-		ButtonFrame.BackgroundTransparency = 0.060
+		ButtonFrame.Parent = ButtonRow
+		ButtonFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+		ButtonFrame.BackgroundColor3 = WinWare.PopupSurfaceColor
+		ButtonFrame.BackgroundTransparency = 0
 		ButtonFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ButtonFrame.BorderSizePixel = 0
-		ButtonFrame.Size = UDim2.new(1, -12, 0, 36)
+		ButtonFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+		ButtonFrame.Size = UDim2.new(1, -20, 0, 30)
 		ButtonFrame.ZIndex = LayerIndex + 8
 
 		BasedLabel.Name = WinWare.RandomString();
@@ -4321,14 +4338,14 @@ function WinWare:RegisiterItem(Frame: Frame , Signel)
 		BasedLabel.BackgroundTransparency = 1.000
 		BasedLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		BasedLabel.BorderSizePixel = 0
-		BasedLabel.Position = UDim2.new(0, 38, 0, 9)
-		BasedLabel.Size = UDim2.new(1, -50, 0, 18)
+		BasedLabel.Position = UDim2.new(0, 36, 0, 6)
+		BasedLabel.Size = UDim2.new(1, -46, 0, 18)
 		BasedLabel.ZIndex = LayerIndex + 9
-		BasedLabel.FontFace = WinWare.MontserratSemiBold
+		BasedLabel.FontFace = WinWare.MontserratMedium
 		BasedLabel.Text = Config.Name;
-		BasedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-		BasedLabel.TextSize = 14.000
-		BasedLabel.TextTransparency = 0.200
+		BasedLabel.TextColor3 = Color3.fromRGB(206, 206, 206)
+		BasedLabel.TextSize = 13.000
+		BasedLabel.TextTransparency = 0
 		BasedLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 		LineFrame.Name = WinWare.RandomString();
@@ -4340,17 +4357,12 @@ function WinWare:RegisiterItem(Frame: Frame , Signel)
 		LineFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		LineFrame.BorderSizePixel = 0
 		LineFrame.Position = UDim2.new(0.5, 0, 1, 0)
-		LineFrame.Size = UDim2.new(1, -30, 0, 2)
+		LineFrame.Size = UDim2.new(1, -20, 0, 2)
 		LineFrame.ZIndex = LayerIndex + 11
 
 		UICorner.CornerRadius = UDim.new(0, 9)
 		UICorner.Parent = ButtonFrame
 
-		local ButtonStroke = Instance.new("UIStroke")
-		ButtonStroke.Color = WinWare.PopupStrokeColor
-		ButtonStroke.Thickness = 1
-		ButtonStroke.Transparency = 0.92
-		ButtonStroke.Parent = ButtonFrame
 
 		Icon.Name = WinWare.RandomString();
 		Icon.Parent = ButtonFrame
@@ -4358,14 +4370,14 @@ function WinWare:RegisiterItem(Frame: Frame , Signel)
 		Icon.BackgroundTransparency = 1.000
 		Icon.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Icon.BorderSizePixel = 0
-		Icon.Position = UDim2.new(0, 10, 0, 8)
+		Icon.Position = UDim2.new(0, 10, 0, 5)
 		Icon.Size = UDim2.new(0, 20, 0, 20)
 		Icon.ZIndex = LayerIndex + 9
 		Icon.FontFace = WinWare.BuiltInBold
 		Icon.Text = Config.Icon
-		Icon.TextColor3 = Color3.fromRGB(223, 223, 223)
+		Icon.TextColor3 = Color3.fromRGB(206, 206, 206)
 		Icon.TextSize = 19.000
-		Icon.TextTransparency = 0.100
+		Icon.TextTransparency = 0
 		Icon.TextWrapped = true
 
 		function Button:SetText(t)
@@ -4382,32 +4394,32 @@ function WinWare:RegisiterItem(Frame: Frame , Signel)
 
 		WinWare:AddSignal(bth.MouseEnter:Connect(LPH_NO_VIRTUALIZE(function()
 			WinWare.PlayAnimate(ButtonFrame , SlowyTween , {
-				BackgroundTransparency = 0
+				BackgroundColor3 = WinWare.PopupSurfaceTopColor
 			});
 		end)))
 
 		WinWare:AddSignal(bth.MouseLeave:Connect(LPH_NO_VIRTUALIZE(function()
 			WinWare.PlayAnimate(ButtonFrame , SlowyTween , {
-				BackgroundTransparency = 0.060
+				BackgroundColor3 = WinWare.PopupSurfaceColor
 			});
 		end)))
 
 		Button.SetRender = LPH_NO_VIRTUALIZE(function(value)
 			if value then
 				WinWare.PlayAnimate(ButtonFrame , SlowyTween , {
-					BackgroundTransparency = 0.060
+					BackgroundTransparency = 0
 				});
 
 				WinWare.PlayAnimate(BasedLabel , SlowyTween , {
-					TextTransparency = 0.200
+					TextTransparency = 0
 				});
 
 				WinWare.PlayAnimate(LineFrame , SlowyTween , {
-					BackgroundTransparency = 0.650
+					BackgroundTransparency = 1
 				});
 
 				WinWare.PlayAnimate(Icon , SlowyTween , {
-					TextTransparency = 0.250
+					TextTransparency = 0
 				});
 			else
 				WinWare.PlayAnimate(ButtonFrame , SlowyTween , {
@@ -4480,7 +4492,7 @@ function WinWare:RegisiterItem(Frame: Frame , Signel)
 		LineFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		LineFrame.BorderSizePixel = 0
 		LineFrame.Position = UDim2.new(0.5, 0, 1, 0)
-		LineFrame.Size = UDim2.new(1, -30, 0, 2)
+		LineFrame.Size = UDim2.new(1, -20, 0, 2)
 		LineFrame.ZIndex = LayerIndex + 11
 
 		UICorner.CornerRadius = UDim.new(0, 10)
@@ -6072,7 +6084,7 @@ function WinWare:CreateWindow(Config)
 		LineFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		LineFrame.BorderSizePixel = 0
 		LineFrame.Position = UDim2.new(0.5, 0, 1, 0)
-		LineFrame.Size = UDim2.new(1, -30, 0, 2)
+		LineFrame.Size = UDim2.new(1, -20, 0, 2)
 		LineFrame.ZIndex = 154
 
 		BasedHandler.Name = WinWare.RandomString();
