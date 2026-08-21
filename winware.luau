@@ -86,40 +86,91 @@ WinWare.ScreenGui = GlobalWindow;
 WinWare.Flags = {};
 WinWare.AccentColor = Color3.fromRGB(0, 86, 255);
 
-WinWare.SetAccentColor = LPH_NO_VIRTUALIZE(function(self , Color)
-	if typeof(Color) == "string" then
-		Color = Color3.fromHex((Color:gsub("#" , "")));
+WinWare.AccentRepaintFrom = nil;
+WinWare.AccentRepaintQueued = false;
+
+WinWare.RepaintAccent = LPH_NO_VIRTUALIZE(function(self , Previous , Color)
+	local Objects = WinWare.ScreenGui:GetDescendants();
+	local Locked = {};
+
+	for _ , Object in next , Objects do
+		if Object:GetAttribute("WinWareNoAccent") then
+			Locked[Object] = true;
+		end;
 	end;
-
-	local Previous = WinWare.AccentColor;
-
-	WinWare.AccentColor = Color;
 
 	local Same = function(Value)
 		return math.abs(Value.R - Previous.R) < 0.004 and math.abs(Value.G - Previous.G) < 0.004 and math.abs(Value.B - Previous.B) < 0.004;
 	end;
 
-	for _ , Object in next , WinWare.ScreenGui:GetDescendants() do
+	local IsLocked = function(Object)
+		local Current = Object;
+
+		while Current and Current ~= WinWare.ScreenGui do
+			if Locked[Current] then
+				return true;
+			end;
+
+			Current = Current.Parent;
+		end;
+
+		return false;
+	end;
+
+	for _ , Object in next , Objects do
 		if Object:IsA("UIStroke") then
-			if Same(Object.Color) then
+			if Same(Object.Color) and not IsLocked(Object) then
 				Object.Color = Color;
 			end;
 		elseif Object:IsA("GuiObject") then
-			if Same(Object.BackgroundColor3) then
+			if Same(Object.BackgroundColor3) and not IsLocked(Object) then
 				Object.BackgroundColor3 = Color;
 			end;
 
 			if Object:IsA("TextLabel") or Object:IsA("TextButton") or Object:IsA("TextBox") then
-				if Same(Object.TextColor3) then
+				if Same(Object.TextColor3) and not IsLocked(Object) then
 					Object.TextColor3 = Color;
 				end;
 			elseif Object:IsA("ImageLabel") or Object:IsA("ImageButton") then
-				if Same(Object.ImageColor3) then
+				if Same(Object.ImageColor3) and not IsLocked(Object) then
 					Object.ImageColor3 = Color;
 				end;
 			end;
 		end;
 	end;
+end);
+
+WinWare.SetAccentColor = LPH_NO_VIRTUALIZE(function(self , Color)
+	if typeof(Color) == "string" then
+		Color = Color3.fromHex((Color:gsub("#" , "")));
+	end;
+
+	if WinWare.AccentColor == Color then
+		return;
+	end;
+
+	if not WinWare.AccentRepaintFrom then
+		WinWare.AccentRepaintFrom = WinWare.AccentColor;
+	end;
+
+	WinWare.AccentColor = Color;
+
+	if WinWare.AccentRepaintQueued then
+		return;
+	end;
+
+	WinWare.AccentRepaintQueued = true;
+
+	task.defer(LPH_NO_VIRTUALIZE(function()
+		local Previous = WinWare.AccentRepaintFrom;
+
+		WinWare.AccentRepaintFrom = nil;
+		WinWare.AccentRepaintQueued = false;
+
+		if Previous and Previous ~= WinWare.AccentColor then
+			WinWare:RepaintAccent(Previous , WinWare.AccentColor);
+		end;
+	end));
 end);
 WinWare.MainColor = Color3.fromRGB(11, 11, 11);
 WinWare.PopupSurfaceColor = Color3.fromRGB(11, 11, 11);
@@ -2072,6 +2123,7 @@ function WinWare:CreateColorPicker(HandleFrame: Frame)
 	ColorPickerHandler.Position = UDim2.new(255, 0, 255, 20)
 	ColorPickerHandler.Size = UDim2.new(0, 200, 0, 240)
 	ColorPickerHandler.ZIndex = ZIndex + 125
+	ColorPickerHandler:SetAttribute("WinWareNoAccent" , true);
 
 	WinWare:AddSignal(ColorPickerHandler:GetPropertyChangedSignal('BackgroundTransparency'):Connect(LPH_NO_VIRTUALIZE(function()
 		if ColorPickerHandler.BackgroundTransparency > 0.9 then
@@ -2187,6 +2239,7 @@ function WinWare:CreateColorPicker(HandleFrame: Frame)
 			local TargetY = math.clamp(HandleFrame.AbsolutePosition.Y + HandleFrame.AbsoluteSize.Y + 8 , 10 , math.max(10 , Viewport.Y - 250));
 
 			ColorPickerHandler.Position = UDim2.new(0, TargetX, 0, TargetY);
+			SaViMap.BackgroundColor3 = Color3.fromHSV(ColorPickerLib.H , 1 , 1);
 
 			WinWare.PlayAnimate(ColorPickerHandler,SlowyTween , {
 				BackgroundTransparency = 0.100
@@ -3032,6 +3085,7 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 		ColorPicker.Size = UDim2.new(0, 22, 0, 22)
 		ColorPicker.ZIndex = ZINdex + 13
 		ColorPicker.LayoutOrder = -(#Handler:GetChildren() + 5);
+		ColorPicker:SetAttribute("WinWareNoAccent" , true);
 
 		UICorner.CornerRadius = UDim.new(0, 4)
 		UICorner.Parent = ColorPicker
