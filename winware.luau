@@ -4918,31 +4918,8 @@ function WinWare:CreateWindow(Config)
 	UICorner.Parent = WindowFrame
 	local WindowStroke = Instance.new("UIStroke", WindowFrame)
 	WindowStroke.Color = Color3.fromRGB(255, 255, 255)
-	WindowStroke.Transparency = 0.400
+	WindowStroke.Transparency = 0.950
 	WindowStroke.Thickness = 1
-
-	local WindowStrokeGradient = Instance.new("UIGradient", WindowStroke)
-	WindowStrokeGradient.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(27, 39, 88)),
-		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(96, 156, 255)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(27, 39, 88)),
-	})
-	WindowStrokeGradient.Rotation = 25
-	WindowStrokeGradient.Offset = Vector2.new(-1, 0)
-
-	task.spawn(LPH_NO_VIRTUALIZE(function()
-		while WindowStrokeGradient.Parent do
-			WinWare.PlayAnimate(WindowStrokeGradient , TweenInfo.new(2.8 , Enum.EasingStyle.Sine , Enum.EasingDirection.InOut) , {
-				Offset = Vector2.new(1, 0)
-			});
-
-			task.wait(3.6);
-
-			WindowStrokeGradient.Offset = Vector2.new(-1, 0);
-
-			task.wait(1.4);
-		end;
-	end));
 
 	LeftMenuFrame.Name = WinWare.RandomString();
 	LeftMenuFrame.Parent = WindowFrame
@@ -5090,9 +5067,32 @@ function WinWare:CreateWindow(Config)
 	UICorner_3.CornerRadius = UDim.new(1, 0)
 	UICorner_3.Parent = AccountProfile
 	local AccountStroke = Instance.new("UIStroke", AccountProfile)
-	AccountStroke.Color = Color3.fromRGB(77, 255, 158)
-	AccountStroke.Thickness = 2.2
+	AccountStroke.Color = Color3.fromRGB(255, 255, 255)
+	AccountStroke.Thickness = 2.5
 	AccountStroke.Transparency = 0
+
+	local AccountStrokeGradient = Instance.new("UIGradient", AccountStroke)
+	AccountStrokeGradient.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(27, 39, 88)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(96, 156, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(27, 39, 88)),
+	})
+	AccountStrokeGradient.Rotation = 45
+	AccountStrokeGradient.Offset = Vector2.new(-1, 0)
+
+	task.spawn(LPH_NO_VIRTUALIZE(function()
+		while AccountStrokeGradient.Parent do
+			WinWare.PlayAnimate(AccountStrokeGradient , TweenInfo.new(2.4 , Enum.EasingStyle.Sine , Enum.EasingDirection.InOut) , {
+				Offset = Vector2.new(1, 0)
+			});
+
+			task.wait(3);
+
+			AccountStrokeGradient.Offset = Vector2.new(-1, 0);
+
+			task.wait(1.2);
+		end;
+	end));
 
 	AccountName.Name = WinWare.RandomString();
 	AccountName.Parent = BottomFrame
@@ -5315,18 +5315,18 @@ function WinWare:CreateWindow(Config)
 	SearchFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	SearchFrame.BorderSizePixel = 0
 	SearchFrame.ClipsDescendants = true
-	SearchFrame.Position = UDim2.new(1, -54, 0.5, 0)
-	SearchFrame.Size = UDim2.new(0, 240, 0, 34)
+	SearchFrame.Position = UDim2.new(1, -64, 0.5, 0)
+	SearchFrame.Size = UDim2.new(0.6, 0, 0, 47)
 	SearchFrame.ZIndex = 12
 	SearchFrame.Visible = true
 
 	local SearchCorner = Instance.new("UICorner", SearchFrame)
-	SearchCorner.CornerRadius = UDim.new(0, 11)
+	SearchCorner.CornerRadius = UDim.new(0, 13)
 
 	local SearchStroke = Instance.new("UIStroke", SearchFrame)
 	SearchStroke.Color = WinWare.PopupStrokeColor
-	SearchStroke.Transparency = WinWare.PopupStrokeTransparency
-	SearchStroke.Thickness = 1
+	SearchStroke.Transparency = 0.950
+	SearchStroke.Thickness = 1.3
 
 	local WebFrame = Instance.new("Frame")
 	local WebIcon = Instance.new("TextLabel")
@@ -5338,16 +5338,16 @@ function WinWare:CreateWindow(Config)
 	WebFrame.BackgroundTransparency = 0.150
 	WebFrame.BorderSizePixel = 0
 	WebFrame.Position = UDim2.new(1, -10, 0.5, 0)
-	WebFrame.Size = UDim2.new(0, 34, 0, 34)
+	WebFrame.Size = UDim2.new(0, 47, 0, 47)
 	WebFrame.ZIndex = 12
 
 	local WebCorner = Instance.new("UICorner", WebFrame)
-	WebCorner.CornerRadius = UDim.new(0, 11)
+	WebCorner.CornerRadius = UDim.new(0, 13)
 
 	local WebStroke = Instance.new("UIStroke", WebFrame)
 	WebStroke.Color = WinWare.PopupStrokeColor
-	WebStroke.Transparency = WinWare.PopupStrokeTransparency
-	WebStroke.Thickness = 1
+	WebStroke.Transparency = 0.950
+	WebStroke.Thickness = 1.3
 
 	WebIcon.Name = WinWare.RandomString();
 	WebIcon.Parent = WebFrame
@@ -5356,12 +5356,12 @@ function WinWare:CreateWindow(Config)
 	WebIcon.BackgroundTransparency = 1.000
 	WebIcon.BorderSizePixel = 0
 	WebIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
-	WebIcon.Size = UDim2.new(0, 20, 0, 20)
+	WebIcon.Size = UDim2.new(0, 24, 0, 24)
 	WebIcon.ZIndex = 12
 	WebIcon.FontFace = WinWare.BuiltInBold
 	WebIcon.Text = "globe-simplified"
 	WebIcon.TextColor3 = Color3.fromRGB(219, 219, 219)
-	WebIcon.TextSize = 18.000
+	WebIcon.TextSize = 20.000
 	WebIcon.TextWrapped = true
 
 	WinWare:CreateInput(WebFrame , LPH_NO_VIRTUALIZE(function()
@@ -5385,13 +5385,13 @@ function WinWare:CreateWindow(Config)
 	SearchIcon.BackgroundTransparency = 1.000
 	SearchIcon.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	SearchIcon.BorderSizePixel = 0
-	SearchIcon.Position = UDim2.new(0, 8, 0.5, 0)
-	SearchIcon.Size = UDim2.new(0, 22, 0, 22)
+	SearchIcon.Position = UDim2.new(0, 12, 0.5, 0)
+	SearchIcon.Size = UDim2.new(0, 26, 0, 26)
 	SearchIcon.ZIndex = 12
 	SearchIcon.FontFace = WinWare.BuiltInBold
 	SearchIcon.Text = "magnifying-glass"
 	SearchIcon.TextColor3 = Color3.fromRGB(76, 76, 76)
-	SearchIcon.TextSize = 17.000
+	SearchIcon.TextSize = 20.000
 	SearchIcon.TextTransparency = 0
 	SearchIcon.TextWrapped = true
 
@@ -5402,8 +5402,8 @@ function WinWare:CreateWindow(Config)
 	SearchBox.BackgroundTransparency = 1.000
 	SearchBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	SearchBox.BorderSizePixel = 0
-	SearchBox.Position = UDim2.new(0, 38, 0.5, 0)
-	SearchBox.Size = UDim2.new(1, -48, 0, 22)
+	SearchBox.Position = UDim2.new(0, 46, 0.5, 0)
+	SearchBox.Size = UDim2.new(1, -58, 0, 28)
 	SearchBox.ZIndex = 12
 	SearchBox.ClearTextOnFocus = false
 	SearchBox.FontFace = WinWare.MontserratMedium
@@ -5411,7 +5411,7 @@ function WinWare:CreateWindow(Config)
 	SearchBox.PlaceholderColor3 = Color3.fromRGB(76, 76, 76)
 	SearchBox.Text = ""
 	SearchBox.TextColor3 = Color3.fromRGB(206, 206, 206)
-	SearchBox.TextSize = 14.000
+	SearchBox.TextSize = 17.000
 	SearchBox.TextTransparency = 0.350
 	SearchBox.TextXAlignment = Enum.TextXAlignment.Left
 
