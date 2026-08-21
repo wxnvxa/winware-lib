@@ -14,7 +14,7 @@ window:SetAccount({
 	Lifetime = true,
 })
 
-window:SetWebsite("https://sorrelhub.com")
+window:SetWebsite("https://sorrelhub.xyz/")
 
 local notifier = WinWare:CreateNotification()
 local function notify(message)

@@ -5302,7 +5302,7 @@ function WinWare:CreateWindow(Config)
 	ConfigBthIcon.TextTransparency = 0.250
 	ConfigBthIcon.TextWrapped = true
 
-	Window.Website = Window.Website or "https://sorrelhub.com";
+	Window.Website = Window.Website or "https://sorrelhub.xyz/";
 
 	function Window:SetWebsite(Link: string)
 		Window.Website = Link;
