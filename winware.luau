@@ -85,6 +85,42 @@ WinWare.IconColor = Color3.fromRGB(255, 255, 255);
 WinWare.ScreenGui = GlobalWindow;
 WinWare.Flags = {};
 WinWare.AccentColor = Color3.fromRGB(0, 86, 255);
+
+WinWare.SetAccentColor = LPH_NO_VIRTUALIZE(function(self , Color)
+	if typeof(Color) == "string" then
+		Color = Color3.fromHex((Color:gsub("#" , "")));
+	end;
+
+	local Previous = WinWare.AccentColor;
+
+	WinWare.AccentColor = Color;
+
+	local Same = function(Value)
+		return math.abs(Value.R - Previous.R) < 0.004 and math.abs(Value.G - Previous.G) < 0.004 and math.abs(Value.B - Previous.B) < 0.004;
+	end;
+
+	for _ , Object in next , WinWare.ScreenGui:GetDescendants() do
+		if Object:IsA("UIStroke") then
+			if Same(Object.Color) then
+				Object.Color = Color;
+			end;
+		elseif Object:IsA("GuiObject") then
+			if Same(Object.BackgroundColor3) then
+				Object.BackgroundColor3 = Color;
+			end;
+
+			if Object:IsA("TextLabel") or Object:IsA("TextButton") or Object:IsA("TextBox") then
+				if Same(Object.TextColor3) then
+					Object.TextColor3 = Color;
+				end;
+			elseif Object:IsA("ImageLabel") or Object:IsA("ImageButton") then
+				if Same(Object.ImageColor3) then
+					Object.ImageColor3 = Color;
+				end;
+			end;
+		end;
+	end;
+end);
 WinWare.MainColor = Color3.fromRGB(11, 11, 11);
 WinWare.PopupSurfaceColor = Color3.fromRGB(11, 11, 11);
 WinWare.PopupSurfaceTopColor = Color3.fromRGB(21, 21, 21);
@@ -1495,6 +1531,8 @@ WinWare.CreateBlurModule = LPH_NO_VIRTUALIZE(function(self , Frame , Signal)
 	end;
 
 	Frame.Destroying:Connect(disconnect);
+
+	WinWare.__BlurDisconnect = disconnect;
 
 	return rbxsignal;
 end);
@@ -6718,7 +6756,7 @@ function WinWare:CreateWindow(Config)
 		return ConfigLib;
 	end;
 
-	Window:_InitConfig();
+	Window.Config = Window:_InitConfig();
 
 	local UserSettings = WinWare:CreateOptionWindow(BottomFrame , BottomFrame.ZIndex + 13);
 	local reciveSignal;
@@ -6781,6 +6819,232 @@ function WinWare:CreateWindow(Config)
 		else
 			Window.UserSettings.UserFrame = UserSettings:AddUserFrame(Window.Username , Window.Profile , Window.Expires);
 		end;
+	end;
+
+	function Window:AddLibrarySettings(Config)
+		Config = Config or {};
+
+		local Flag = Config.Flag or "WinWare";
+		local LabelText = Config.Label;
+		local WithConfigs = Config.Config ~= false;
+		local BlurDefault = Config.Blur ~= false;
+		local WatermarkDefault = Config.Watermark == true;
+		local OpacityDefault = Config.Opacity or 96;
+		local ScaleDefault = Config.Scale or "Default";
+		local Tab = Config.Tab;
+		local Settings = {};
+
+		if LabelText == nil then
+			LabelText = "SETTINGS";
+		end;
+
+		if not Tab then
+			if LabelText then
+				Window:AddTabLabel(LabelText);
+			end;
+
+			Tab = Window:AddTab({
+				Name = Config.Name or "Settings",
+				Icon = Config.Icon or "gear"
+			});
+		end;
+
+		local Interface = Tab:AddSection({
+			Name = "INTERFACE",
+			Position = "left"
+		});
+
+		local Appearance = Tab:AddSection({
+			Name = "APPEARANCE",
+			Position = "right"
+		});
+
+		Settings.Tab = Tab;
+		Settings.Interface = Interface;
+		Settings.Appearance = Appearance;
+
+		Settings.MenuKey = Interface:AddLabel("Menu Key"):AddKeybind({
+			Flag = Flag .. ".MenuKey",
+			Default = Window.Keybind,
+			Callback = LPH_NO_VIRTUALIZE(function(Key)
+				Window.Keybind = Key;
+			end)
+		});
+
+		Settings.Scale = Interface:AddLabel("Menu Scale"):AddDropdown({
+			Flag = Flag .. ".MenuScale",
+			Default = ScaleDefault,
+			Values = { "Small" , "Mobile" , "Default" , "Large" },
+			Size = 110,
+			Callback = LPH_NO_VIRTUALIZE(function(Value)
+				local Scale = WinWare.Scales[Value];
+
+				if Scale then
+					Window:SetSize(Scale);
+				end;
+			end)
+		});
+
+		Settings.Opacity = Interface:AddLabel("Menu Opacity"):AddSlider({
+			Flag = Flag .. ".MenuOpacity",
+			Default = OpacityDefault,
+			Min = 40,
+			Max = 100,
+			Type = "%",
+			Size = 233,
+			Callback = LPH_NO_VIRTUALIZE(function(Value)
+				WindowFrame.BackgroundTransparency = 1 - (math.clamp(Value , 40 , 100) / 100);
+			end)
+		});
+
+		Settings.Blur = Interface:AddLabel("Menu Blur"):AddToggle({
+			Flag = Flag .. ".MenuBlur",
+			Default = BlurDefault,
+			Callback = LPH_NO_VIRTUALIZE(function(Value)
+				WinWare.EnabledBlur = Value;
+
+				if Value then
+					if not WinWare.__BlurDisconnect then
+						WinWare:CreateBlurModule(WindowFrame , Window.Signal);
+					end;
+				elseif WinWare.__BlurDisconnect then
+					WinWare.__BlurDisconnect();
+
+					WinWare.__BlurDisconnect = nil;
+				end;
+			end)
+		});
+
+		Settings.Watermark = Interface:AddLabel("Watermark"):AddToggle({
+			Flag = Flag .. ".Watermark",
+			Default = WatermarkDefault,
+			Callback = LPH_NO_VIRTUALIZE(function(Value)
+				Window:Watermark():SetRender(Value);
+			end)
+		});
+
+		Settings.Accent = Appearance:AddLabel("Accent Color"):AddColorPicker({
+			Flag = Flag .. ".AccentColor",
+			Default = WinWare.AccentColor,
+			Callback = LPH_NO_VIRTUALIZE(function(Value)
+				WinWare:SetAccentColor(Value);
+			end)
+		});
+
+		if Window.Enable3DRenderer then
+			Settings.Render3D = Appearance:AddLabel("3D Render"):AddToggle({
+				Flag = Flag .. ".Render3D",
+				Default = false,
+				Callback = LPH_NO_VIRTUALIZE(function(Value)
+					Window:Set3DRender(Value);
+				end)
+			});
+		end;
+
+		Appearance:AddButton({
+			Name = "Reset Position",
+			Icon = "arrow-spin-clockwise",
+			Callback = LPH_NO_VIRTUALIZE(function()
+				WinWare.PlayAnimate(WindowFrame , VSlowTween , {
+					Position = UDim2.fromScale(0.5 , 0.5)
+				})
+			end)
+		});
+
+		if Window.Website then
+			Appearance:AddButton({
+				Name = "Copy Website",
+				Icon = "page",
+				Callback = LPH_NO_VIRTUALIZE(function()
+					setclipboard(Window.Website);
+
+					Logging.new("page" , "Website copied" , 3.5);
+				end)
+			});
+		end;
+
+		if WithConfigs then
+			local Configs = Tab:AddSection({
+				Name = "CONFIGS",
+				Position = "right"
+			});
+
+			local ConfigName = "Default";
+
+			local GetPath = LPH_NO_VIRTUALIZE(function()
+				return Window.ConfigFolder .. "/" .. ConfigName;
+			end);
+
+			Settings.Configs = Configs;
+
+			Settings.ConfigName = Configs:AddLabel("Config Name"):AddTextInput({
+				Flag = Flag .. ".ConfigName",
+				Default = "Default",
+				Placeholder = "Default",
+				Size = 120,
+				Callback = LPH_NO_VIRTUALIZE(function(Value)
+					ConfigName = (Value ~= "" and Value) or "Default";
+				end)
+			});
+
+			Configs:AddButton({
+				Name = "Save Config",
+				Icon = "check",
+				Callback = LPH_NO_VIRTUALIZE(function()
+					if not Window.Config then
+						return;
+					end;
+
+					writefile(GetPath() , Window.Config:GetData());
+
+					Window.Config.SelectedConfig = ConfigName;
+					Window.Config:RefreshConfig();
+
+					Logging.new("folder" , "Saved " .. ConfigName , 3.5);
+				end)
+			});
+
+			Configs:AddButton({
+				Name = "Load Config",
+				Icon = "folder",
+				Callback = LPH_NO_VIRTUALIZE(function()
+					if not Window.Config or not isfile(GetPath()) then
+						return;
+					end;
+
+					Window.Config:LoadData(readfile(GetPath()));
+
+					Window.Config.SelectedConfig = ConfigName;
+
+					Logging.new("folder" , "Loaded " .. ConfigName , 3.5);
+				end)
+			});
+
+			Configs:AddButton({
+				Name = "Delete Config",
+				Icon = "x",
+				Callback = LPH_NO_VIRTUALIZE(function()
+					if not Window.Config or not isfile(GetPath()) then
+						return;
+					end;
+
+					delfile(GetPath());
+
+					Window.Config.SelectedConfig = "Default";
+					Window.Config:RefreshConfig();
+
+					Logging.new("folder" , "Deleted " .. ConfigName , 3.5);
+				end)
+			});
+		end;
+
+		Settings.AddSection = LPH_NO_VIRTUALIZE(function(self , SectionConfig)
+			return Tab:AddSection(SectionConfig);
+		end);
+
+		Window.Settings = Settings;
+
+		return Settings;
 	end;
 
 	function Window:SetSize(newsize)

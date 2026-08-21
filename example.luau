@@ -29,9 +29,7 @@ local visualsEsp = window:AddTab({ Name = "ESP", Icon = "nine-dots-grid", Parent
 local visualsAnimations = window:AddTab({ Name = "Animations", Icon = "person", Parent = visuals })
 local player = window:AddTab({ Name = "Player", Icon = "person" })
 local misc = window:AddTab({ Name = "Misc", Icon = "nine-dots-grid" })
-window:AddTabLabel("SETTINGS")
-local settings = window:AddTab({ Name = "Settings", Icon = "gear" })
-local configManager = window:AddTab({ Name = "Config Manager", Icon = "page" })
+
 
 local ragebot = combat:AddSection({ Name = "RAGEBOT", Position = "left" })
 local rageEnabled = ragebot:AddLabel("Enabled")
@@ -123,29 +121,14 @@ automation:AddLabel("Notifications"):AddToggle({ Flag = "Misc.Notifications", De
 automation:AddLabel("Join Mode"):AddDropdown({ Flag = "Misc.JoinMode", Default = "Friends", Values = { "Friends", "Lowest Ping", "Random" }, Size = 110 })
 automation:AddButton({ Name = "Copy Job ID", Icon = "page", Callback = function() notify("Job ID copied") end })
 
-local appearance = settings:AddSection({ Name = "APPEARANCE", Position = "left" })
-appearance:AddLabel("Menu Blur"):AddToggle({ Flag = "Settings.MenuBlur", Default = true })
-appearance:AddLabel("Watermark"):AddToggle({ Flag = "Settings.Watermark" })
-appearance:AddLabel("Menu Opacity"):AddSlider({ Flag = "Settings.Opacity", Min = 0, Max = 100, Default = 90, Type = "%", Size = 233 })
-appearance:AddLabel("Theme Color"):AddColorPicker({ Flag = "Settings.ThemeColor", Default = "#0056FF" })
+local settings = window:AddLibrarySettings()
 
-local inputSettings = settings:AddSection({ Name = "INPUT", Position = "right" })
-inputSettings:AddLabel("Menu Key"):AddKeybind({ Flag = "Settings.MenuKey", Default = "Insert" })
-inputSettings:AddLabel("Save On Exit"):AddToggle({ Flag = "Settings.SaveOnExit", Default = true })
-inputSettings:AddLabel("Open On Execute"):AddToggle({ Flag = "Settings.OpenOnExecute", Default = true })
-inputSettings:AddLabel("Language"):AddDropdown({ Flag = "Settings.Language", Default = "English", Values = { "English", "Russian" }, Size = 100 })
+settings.Interface:AddLabel("Open On Execute"):AddToggle({ Flag = "Settings.OpenOnExecute", Default = true })
+settings.Appearance:AddLabel("Language"):AddDropdown({ Flag = "Settings.Language", Default = "English", Values = { "English", "Russian" }, Size = 100 })
 
-local configActions = configManager:AddSection({ Name = "CONFIGURATION", Position = "left" })
-configActions:AddLabel("Config Name"):AddTextInput({ Flag = "Config.Name", Placeholder = "Default", Default = "Default", Size = 120 })
-configActions:AddLabel("Auto Save"):AddToggle({ Flag = "Config.AutoSave", Default = true })
-configActions:AddButton({ Name = "Save Config", Icon = "check", Callback = function() notify("Config saved") end })
-configActions:AddButton({ Name = "Load Config", Icon = "folder", Callback = function() notify("Config loaded") end })
-
-local configProfiles = configManager:AddSection({ Name = "PROFILES", Position = "right" })
-configProfiles:AddLabel("Selected"):AddDropdown({ Flag = "Config.Selected", Default = "Default", Values = { "Default", "Legit", "Rage" }, Size = 120 })
-configProfiles:AddButton({ Name = "Refresh List", Icon = "arrow-spin-clockwise", Callback = function() notify("Config list refreshed") end })
-configProfiles:AddButton({ Name = "Delete Config", Icon = "x", Callback = function() notify("Config deleted") end })
-configProfiles:AddButton({ Name = "Reset Defaults", Icon = "gear", Callback = function() notify("Defaults restored") end })
+local scriptSettings = settings:AddSection({ Name = "SCRIPT", Position = "left" })
+scriptSettings:AddLabel("Auto Save"):AddToggle({ Flag = "Settings.AutoSave", Default = true })
+scriptSettings:AddButton({ Name = "Reset Defaults", Icon = "gear", Callback = function() notify("Defaults restored") end })
 
 local espSection = visualsEsp:AddSection({ Name = "PLAYERS", Position = "left" })
 espSection:AddLabel("Boxes"):AddToggle({ Flag = "Visuals.ESP.Boxes" })
