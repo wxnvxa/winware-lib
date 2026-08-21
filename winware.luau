@@ -5442,21 +5442,7 @@ function WinWare:CreateWindow(Config)
 			TabLabel.TextYAlignment = Enum.TextYAlignment.Bottom
 		end
 
-		local SetRender = LPH_NO_VIRTUALIZE(function(val)
-			if val then
-				WinWare.PlayAnimate(TabLabel , SlowyTween,{
-					TextTransparency = 0
-				})
-			else
-				WinWare.PlayAnimate(TabLabel , SlowyTween,{
-					TextTransparency = 1
-				})
-			end
-		end)
-
-		SetRender(Window.Signal:GetValue());
-
-		return Window.Signal:Connect(SetRender);
+		TabLabel.TextTransparency = 0;
 	end;
 
 	function Window:AddTab(Config)
@@ -5812,25 +5798,7 @@ function WinWare:CreateWindow(Config)
 
 		Window.Signal:Connect(LPH_NO_VIRTUALIZE(function(value)
 			if value then
-				if Window.Tabs[Window.CurrentTab] == Tab then
-					Tab.SetValue(true)
-				else
-					Tab.SetValue(false);
-				end;
-			else
-				Tab.SetValue(false);
-
-				WinWare.PlayAnimate(TabButton , SlowyTween , {
-					BackgroundTransparency = 1
-				})
-
-				WinWare.PlayAnimate(TabIcon , SlowyTween , {
-					TextTransparency = 1,
-				})
-
-				WinWare.PlayAnimate(TabContentLabel , SlowyTween , {
-					TextTransparency = 1
-				})
+				Tab.SetValue(Window.Tabs[Window.CurrentTab] == Tab);
 			end;
 		end));
 
