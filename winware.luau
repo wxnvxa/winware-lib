@@ -34,7 +34,7 @@ local Mouse: Mouse = LocalPlayer:GetMouse();
 local CurrentCamera: Camera = cloneref(workspace.CurrentCamera);
 local GlobalWindow = Instance.new('ScreenGui');
 local ManualTween = TweenInfo.new(0.1);
-local SlowyTween = TweenInfo.new(0.175);
+local SlowyTween = TweenInfo.new(0.220,Enum.EasingStyle.Quint,Enum.EasingDirection.Out);
 local FastTween = TweenInfo.new(0.05);
 local VSlowTween = TweenInfo.new(0.5,Enum.EasingStyle.Quint);
 local WindowFadeTween = TweenInfo.new(0.320,Enum.EasingStyle.Quint,Enum.EasingDirection.Out);
@@ -2771,7 +2771,8 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 				});
 
 				WinWare.PlayAnimate(Frame,SlowyTween,{
-					BackgroundTransparency = 1
+					BackgroundTransparency = 1,
+					Position = SliderLib.GetThumbPosition(0)
 				});
 			end;
 		end);
@@ -4642,7 +4643,7 @@ function WinWare:CreateWindow(Config)
 		makefolder(Window.ConfigFolder);
 	end;
 
-	local WindowFrame = Instance.new("Frame")
+	local WindowFrame = Instance.new("CanvasGroup")
 	local UICorner = Instance.new("UICorner")
 	local LeftMenuFrame = Instance.new("Frame")
 	local HeadFrame = Instance.new("Frame")
@@ -4681,7 +4682,8 @@ function WinWare:CreateWindow(Config)
 	WinWare.MainWindowFrame = WindowFrame;
 	WindowFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 	WindowFrame.BackgroundColor3 = Color3.fromRGB(11, 11, 11)
-	WindowFrame.BackgroundTransparency = 1
+	WindowFrame.BackgroundTransparency = 0.040
+	WindowFrame.GroupTransparency = 1
 	WindowFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	WindowFrame.BorderSizePixel = 0
 	WindowFrame.ClipsDescendants = true
@@ -4692,7 +4694,7 @@ function WinWare:CreateWindow(Config)
 
 	local renderParentWindow = LPH_NO_VIRTUALIZE(function()
 		if Window.__3DRender then
-			if WindowFrame.BackgroundTransparency > 0.9 then
+			if WindowFrame.GroupTransparency > 0.9 then
 				WindowFrame.Visible = false;
 				WindowFrame.Parent = nil
 			else
@@ -4705,7 +4707,7 @@ function WinWare:CreateWindow(Config)
 				WindowFrame.Parent = Window.SurfaceGui;
 			end;
 		else
-			if WindowFrame.BackgroundTransparency > 0.9 then
+			if WindowFrame.GroupTransparency > 0.9 then
 				WindowFrame.Visible = false;
 				WindowFrame.Parent = nil
 			else
@@ -4717,91 +4719,7 @@ function WinWare:CreateWindow(Config)
 		end;
 	end);
 
-	WinWare:AddSignal(WindowFrame:GetPropertyChangedSignal('BackgroundTransparency'):Connect(renderParentWindow))
-
-	local FadeAlpha = Instance.new("NumberValue");
-	FadeAlpha.Value = 0;
-
-	local FadeItems = {};
-	local FadeVisible = false;
-
-	local CaptureFadeItem = LPH_NO_VIRTUALIZE(function(Object)
-		if Object:IsA("UIStroke") then
-			return { Object = Object , Stroke = Object.Transparency };
-		elseif Object:IsA("GuiObject") then
-			local Item = { Object = Object , Background = Object.BackgroundTransparency };
-
-			if Object:IsA("TextLabel") or Object:IsA("TextButton") or Object:IsA("TextBox") then
-				Item.Text = Object.TextTransparency;
-			end;
-
-			if Object:IsA("ImageLabel") or Object:IsA("ImageButton") then
-				Item.Image = Object.ImageTransparency;
-			end;
-
-			if Object:IsA("ScrollingFrame") then
-				Item.ScrollBar = Object.ScrollBarImageTransparency;
-			end;
-
-			return Item;
-		end;
-
-		return nil;
-	end);
-
-	local ApplyFadeItem = LPH_NO_VIRTUALIZE(function(Item , Alpha)
-		local Object = Item.Object;
-
-		if Item.Background then
-			Object.BackgroundTransparency = Item.Background + (1 - Item.Background) * Alpha;
-		end;
-
-		if Item.Text then
-			Object.TextTransparency = Item.Text + (1 - Item.Text) * Alpha;
-		end;
-
-		if Item.Image then
-			Object.ImageTransparency = Item.Image + (1 - Item.Image) * Alpha;
-		end;
-
-		if Item.ScrollBar then
-			Object.ScrollBarImageTransparency = Item.ScrollBar + (1 - Item.ScrollBar) * Alpha;
-		end;
-
-		if Item.Stroke then
-			Object.Transparency = Item.Stroke + (1 - Item.Stroke) * Alpha;
-		end;
-	end);
-
-	local ApplyFade = LPH_NO_VIRTUALIZE(function()
-		local Alpha = FadeAlpha.Value;
-
-		for Index = #FadeItems , 1 , -1 do
-			local Item = FadeItems[Index];
-
-			if (Alpha <= 0.020 and not Item.Object.Parent) or not pcall(ApplyFadeItem , Item , Alpha) then
-				table.remove(FadeItems , Index);
-			end;
-		end;
-	end);
-
-	local CaptureFade = LPH_NO_VIRTUALIZE(function()
-		if FadeAlpha.Value > 0.020 then
-			return;
-		end;
-
-		local Items = {};
-
-		for _ , Object in ipairs(WindowFrame:GetDescendants()) do
-			local Item = CaptureFadeItem(Object);
-
-			if Item then
-				table.insert(Items , Item);
-			end;
-		end;
-
-		FadeItems = Items;
-	end);
+	WinWare:AddSignal(WindowFrame:GetPropertyChangedSignal('GroupTransparency'):Connect(renderParentWindow))
 
 	local ScaledSize = LPH_NO_VIRTUALIZE(function(Factor)
 		local Base = Window.Size;
@@ -4809,81 +4727,29 @@ function WinWare:CreateWindow(Config)
 		return UDim2.new(Base.X.Scale * Factor , math.floor(Base.X.Offset * Factor) , Base.Y.Scale * Factor , math.floor(Base.Y.Offset * Factor));
 	end);
 
-	WinWare:AddSignal(FadeAlpha:GetPropertyChangedSignal('Value'):Connect(ApplyFade));
-
-	WinWare:AddSignal(WindowFrame.DescendantAdded:Connect(LPH_NO_VIRTUALIZE(function(Object)
-		if FadeAlpha.Value <= 0.020 then
-			return;
-		end;
-
-		task.defer(function()
-			if FadeAlpha.Value <= 0.020 or not Object.Parent then
-				return;
-			end;
-
-			local Item = CaptureFadeItem(Object);
-
-			if Item then
-				table.insert(FadeItems , Item);
-				ApplyFadeItem(Item , FadeAlpha.Value);
-			end;
-		end);
-	end)))
-
 	Window.PrepareFade = LPH_NO_VIRTUALIZE(function()
-		CaptureFade();
-
-		FadeVisible = false;
-		FadeAlpha.Value = 1;
+		WindowFrame.GroupTransparency = 1;
 		WindowFrame.Size = ScaledSize(0.940);
-		WindowFrame.BackgroundTransparency = 1;
 		WindowFrame.Visible = true;
 	end);
 
 	Window.SetRender = LPH_NO_VIRTUALIZE(function(self , value)
 		if value then
-			FadeVisible = true;
 			WindowFrame.Visible = true;
 
-			task.delay(0.400 , LPH_NO_VIRTUALIZE(function()
-				if FadeVisible then
-					FadeAlpha.Value = 0;
-					ApplyFade();
-				end;
-			end));
-
 			WinWare.PlayAnimate(WindowFrame , WindowFadeTween , {
-				BackgroundTransparency = 0.040
+				GroupTransparency = 0
 			})
 
 			WinWare.PlayAnimate(WindowFrame , WindowPopTween , {
 				Size = Window.Size
 			})
 
-			WinWare.PlayAnimate(FadeAlpha , WindowFadeTween , {
-				Value = 0
-			})
-
 			Window.Shadow:Render(true);
 		else
-			CaptureFade();
-
-			FadeVisible = false;
-
-			task.delay(0.300 , LPH_NO_VIRTUALIZE(function()
-				if not FadeVisible then
-					FadeAlpha.Value = 1;
-					ApplyFade();
-				end;
-			end));
-
 			WinWare.PlayAnimate(WindowFrame , WindowHideTween , {
-				BackgroundTransparency = 1,
+				GroupTransparency = 1,
 				Size = ScaledSize(0.940)
-			})
-
-			WinWare.PlayAnimate(FadeAlpha , WindowHideTween , {
-				Value = 1
 			})
 
 			Window.Shadow:Render(false);
