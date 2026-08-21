@@ -14,6 +14,8 @@ window:SetAccount({
 	Lifetime = true,
 })
 
+window:SetWebsite("https://sorrelhub.com")
+
 local notifier = WinWare:CreateNotification()
 local function notify(message)
 	notifier.new({ Title = "WINWARE", Content = message, Duration = 2 })
@@ -23,6 +25,8 @@ window:AddTabLabel("MODULES")
 local combat = window:AddTab({ Name = "Combat", Icon = "sword" })
 local movement = window:AddTab({ Name = "Movement", Icon = "person-running" })
 local visuals = window:AddTab({ Name = "Visuals", Icon = "eye" })
+local visualsEsp = window:AddTab({ Name = "ESP", Icon = "nine-dots-grid", Parent = visuals })
+local visualsAnimations = window:AddTab({ Name = "Animations", Icon = "person", Parent = visuals })
 local player = window:AddTab({ Name = "Player", Icon = "person" })
 local misc = window:AddTab({ Name = "Misc", Icon = "nine-dots-grid" })
 window:AddTabLabel("SETTINGS")
@@ -142,3 +146,12 @@ configProfiles:AddLabel("Selected"):AddDropdown({ Flag = "Config.Selected", Defa
 configProfiles:AddButton({ Name = "Refresh List", Icon = "arrow-spin-clockwise", Callback = function() notify("Config list refreshed") end })
 configProfiles:AddButton({ Name = "Delete Config", Icon = "x", Callback = function() notify("Config deleted") end })
 configProfiles:AddButton({ Name = "Reset Defaults", Icon = "gear", Callback = function() notify("Defaults restored") end })
+
+local espSection = visualsEsp:AddSection({ Name = "PLAYERS", Position = "left" })
+espSection:AddLabel("Boxes"):AddToggle({ Flag = "Visuals.ESP.Boxes" })
+espSection:AddLabel("Names"):AddToggle({ Flag = "Visuals.ESP.Names" })
+espSection:AddLabel("Health"):AddToggle({ Flag = "Visuals.ESP.Health" })
+
+local animationsSection = visualsAnimations:AddSection({ Name = "ANIMATIONS", Position = "left" })
+animationsSection:AddLabel("Custom walk"):AddToggle({ Flag = "Visuals.Animations.Walk" })
+animationsSection:AddLabel("Custom idle"):AddToggle({ Flag = "Visuals.Animations.Idle" })

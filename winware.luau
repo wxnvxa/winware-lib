@@ -4918,8 +4918,33 @@ function WinWare:CreateWindow(Config)
 	UICorner.Parent = WindowFrame
 	local WindowStroke = Instance.new("UIStroke", WindowFrame)
 	WindowStroke.Color = Color3.fromRGB(255, 255, 255)
-	WindowStroke.Transparency = 0.950
+	WindowStroke.Transparency = 0.930
 	WindowStroke.Thickness = 1
+
+	local WindowStrokeGradient = Instance.new("UIGradient", WindowStroke)
+	WindowStrokeGradient.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(0.35, Color3.fromRGB(27, 39, 88)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(60, 126, 255)),
+		ColorSequenceKeypoint.new(0.65, Color3.fromRGB(27, 39, 88)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)),
+	})
+	WindowStrokeGradient.Rotation = 20
+	WindowStrokeGradient.Offset = Vector2.new(-1, 0)
+
+	task.spawn(LPH_NO_VIRTUALIZE(function()
+		while WindowStrokeGradient.Parent do
+			WinWare.PlayAnimate(WindowStrokeGradient , TweenInfo.new(2.8 , Enum.EasingStyle.Sine , Enum.EasingDirection.InOut) , {
+				Offset = Vector2.new(1, 0)
+			});
+
+			task.wait(3.6);
+
+			WindowStrokeGradient.Offset = Vector2.new(-1, 0);
+
+			task.wait(1.4);
+		end;
+	end));
 
 	LeftMenuFrame.Name = WinWare.RandomString();
 	LeftMenuFrame.Parent = WindowFrame
@@ -4973,15 +4998,16 @@ function WinWare:CreateWindow(Config)
 	local WindowNameGradient = Instance.new("UIGradient", WindowName)
 	WindowNameGradient.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(27, 39, 88)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 86, 255)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 86, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 126, 255)),
 	})
 	WindowNameGradient.Rotation = 0
 	WinWare:EnableTextShimmer(WindowName, WindowNameGradient, {
 		BaseColor = Color3.fromRGB(27, 39, 88),
-		PeakColors = { Color3.fromRGB(0, 86, 255), Color3.fromRGB(255, 255, 255) },
+		PeakColors = { Color3.fromRGB(0, 86, 255), Color3.fromRGB(60, 126, 255) },
 		BandCount = 0.6,
-		BandWidth = 0.7,
-		SweepTime = 1.5,
+		BandWidth = 0.75,
+		SweepTime = 1.8,
 		FitToText = true,
 	});
 
@@ -5023,7 +5049,12 @@ function WinWare:CreateWindow(Config)
 	LeftScrollingFrame.Position = UDim2.new(0.5, 0, 0, 74)
 	LeftScrollingFrame.Size = UDim2.new(1, -14, 1, -163)
 	LeftScrollingFrame.ZIndex = 7
-	LeftScrollingFrame.ScrollBarThickness = 0
+	LeftScrollingFrame.ScrollBarThickness = 3
+	LeftScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(219, 219, 219)
+	LeftScrollingFrame.ScrollBarImageTransparency = 0.850
+	LeftScrollingFrame.ScrollingDirection = Enum.ScrollingDirection.Y
+	LeftScrollingFrame.ElasticBehavior = Enum.ElasticBehavior.Never
+	LeftScrollingFrame.VerticalScrollBarInset = Enum.ScrollBarInset.None
 
 	UIListLayout.Parent = LeftScrollingFrame
 	UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
@@ -5032,6 +5063,7 @@ function WinWare:CreateWindow(Config)
 
 	WinWare:AddSignal(UIListLayout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(LPH_NO_VIRTUALIZE(function()
 		LeftScrollingFrame.CanvasSize = UDim2.fromOffset(0,UIListLayout.AbsoluteContentSize.Y + 1)
+		LeftScrollingFrame.ScrollingEnabled = UIListLayout.AbsoluteContentSize.Y > LeftScrollingFrame.AbsoluteSize.Y;
 	end)))
 
 	BottomFrame.Name = WinWare.RandomString();
@@ -5071,16 +5103,28 @@ function WinWare:CreateWindow(Config)
 	AccountName.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	AccountName.BorderSizePixel = 0
 	AccountName.Position = UDim2.new(0, 68, 0, 22)
-	AccountName.Size = UDim2.new(0, 96, 0, 18)
+	AccountName.Size = UDim2.new(0, 112, 0, 18)
 	AccountName.ZIndex = 7
 	AccountName.FontFace = WinWare.MontserratBold
 	AccountName.Text = ""
-	AccountName.TextColor3 = Color3.fromRGB(18, 168, 96)
-	AccountName.TextSize = 14.000
+	AccountName.TextColor3 = Color3.fromRGB(219, 219, 219)
+	AccountName.TextSize = 15.000
 	AccountName.TextXAlignment = Enum.TextXAlignment.Left
 	AccountName.TextTruncate = Enum.TextTruncate.AtEnd;
 	local AccountNameGradient = Instance.new("UIGradient", AccountName)
-	AccountNameGradient.Color = ColorSequence.new(Color3.fromRGB(10, 46, 26), Color3.fromRGB(18, 168, 96))
+	AccountNameGradient.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(219, 219, 219)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 126, 255)),
+	})
+	AccountNameGradient.Rotation = 0
+	WinWare:EnableTextShimmer(AccountName, AccountNameGradient, {
+		BaseColor = Color3.fromRGB(219, 219, 219),
+		PeakColors = { Color3.fromRGB(60, 126, 255), Color3.fromRGB(0, 86, 255) },
+		BandCount = 0.6,
+		BandWidth = 0.75,
+		SweepTime = 2.2,
+		FitToText = false,
+	});
 
 	ExpireLabel.Name = WinWare.RandomString();
 	ExpireLabel.Parent = BottomFrame
@@ -5258,18 +5302,82 @@ function WinWare:CreateWindow(Config)
 	ConfigBthIcon.TextTransparency = 0.250
 	ConfigBthIcon.TextWrapped = true
 
+	Window.Website = Window.Website or "https://sorrelhub.com";
+
+	function Window:SetWebsite(Link: string)
+		Window.Website = Link;
+	end;
+
 	SearchFrame.Name = WinWare.RandomString();
 	SearchFrame.Parent = RightHeader
 	SearchFrame.AnchorPoint = Vector2.new(1, 0.5)
-	SearchFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	SearchFrame.BackgroundTransparency = 1.000
+	SearchFrame.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
+	SearchFrame.BackgroundTransparency = 0.150
 	SearchFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	SearchFrame.BorderSizePixel = 0
 	SearchFrame.ClipsDescendants = true
-	SearchFrame.Position = UDim2.new(1, -10, 0.5, 0)
-	SearchFrame.Size = UDim2.new(0, 30, 0, 30)
+	SearchFrame.Position = UDim2.new(1, -54, 0.5, 0)
+	SearchFrame.Size = UDim2.new(0, 240, 0, 34)
 	SearchFrame.ZIndex = 12
-	SearchFrame.Visible = false
+	SearchFrame.Visible = true
+
+	local SearchCorner = Instance.new("UICorner", SearchFrame)
+	SearchCorner.CornerRadius = UDim.new(0, 11)
+
+	local SearchStroke = Instance.new("UIStroke", SearchFrame)
+	SearchStroke.Color = WinWare.PopupStrokeColor
+	SearchStroke.Transparency = WinWare.PopupStrokeTransparency
+	SearchStroke.Thickness = 1
+
+	local WebFrame = Instance.new("Frame")
+	local WebIcon = Instance.new("TextLabel")
+
+	WebFrame.Name = WinWare.RandomString();
+	WebFrame.Parent = RightHeader
+	WebFrame.AnchorPoint = Vector2.new(1, 0.5)
+	WebFrame.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
+	WebFrame.BackgroundTransparency = 0.150
+	WebFrame.BorderSizePixel = 0
+	WebFrame.Position = UDim2.new(1, -10, 0.5, 0)
+	WebFrame.Size = UDim2.new(0, 34, 0, 34)
+	WebFrame.ZIndex = 12
+
+	local WebCorner = Instance.new("UICorner", WebFrame)
+	WebCorner.CornerRadius = UDim.new(0, 11)
+
+	local WebStroke = Instance.new("UIStroke", WebFrame)
+	WebStroke.Color = WinWare.PopupStrokeColor
+	WebStroke.Transparency = WinWare.PopupStrokeTransparency
+	WebStroke.Thickness = 1
+
+	WebIcon.Name = WinWare.RandomString();
+	WebIcon.Parent = WebFrame
+	WebIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+	WebIcon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	WebIcon.BackgroundTransparency = 1.000
+	WebIcon.BorderSizePixel = 0
+	WebIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+	WebIcon.Size = UDim2.new(0, 20, 0, 20)
+	WebIcon.ZIndex = 12
+	WebIcon.FontFace = WinWare.BuiltInBold
+	WebIcon.Text = "globe-simplified"
+	WebIcon.TextColor3 = Color3.fromRGB(219, 219, 219)
+	WebIcon.TextSize = 18.000
+	WebIcon.TextWrapped = true
+
+	WinWare:CreateInput(WebFrame , LPH_NO_VIRTUALIZE(function()
+		setclipboard(Window.Website);
+
+		WinWare.PlayAnimate(WebIcon , SlowyTween , {
+			TextColor3 = Color3.fromRGB(60, 126, 255)
+		});
+
+		task.delay(0.7 , LPH_NO_VIRTUALIZE(function()
+			WinWare.PlayAnimate(WebIcon , SlowyTween , {
+				TextColor3 = Color3.fromRGB(219, 219, 219)
+			});
+		end));
+	end));
 
 	SearchIcon.Name = WinWare.RandomString();
 	SearchIcon.Parent = SearchFrame
@@ -5278,14 +5386,14 @@ function WinWare:CreateWindow(Config)
 	SearchIcon.BackgroundTransparency = 1.000
 	SearchIcon.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	SearchIcon.BorderSizePixel = 0
-	SearchIcon.Position = UDim2.new(0, 2, 0.5, 0)
-	SearchIcon.Size = UDim2.new(0, 25, 0, 25)
+	SearchIcon.Position = UDim2.new(0, 8, 0.5, 0)
+	SearchIcon.Size = UDim2.new(0, 22, 0, 22)
 	SearchIcon.ZIndex = 12
 	SearchIcon.FontFace = WinWare.BuiltInBold
 	SearchIcon.Text = "magnifying-glass"
-	SearchIcon.TextColor3 = Color3.fromRGB(223, 223, 223)
-	SearchIcon.TextSize = 14.000
-	SearchIcon.TextTransparency = 0.45
+	SearchIcon.TextColor3 = Color3.fromRGB(76, 76, 76)
+	SearchIcon.TextSize = 17.000
+	SearchIcon.TextTransparency = 0
 	SearchIcon.TextWrapped = true
 
 	SearchBox.Name = WinWare.RandomString();
@@ -5295,16 +5403,17 @@ function WinWare:CreateWindow(Config)
 	SearchBox.BackgroundTransparency = 1.000
 	SearchBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	SearchBox.BorderSizePixel = 0
-	SearchBox.Position = UDim2.new(0, 35, 0.5, 0)
-	SearchBox.Size = UDim2.new(1, -35, 0, 25)
+	SearchBox.Position = UDim2.new(0, 38, 0.5, 0)
+	SearchBox.Size = UDim2.new(1, -48, 0, 22)
 	SearchBox.ZIndex = 12
 	SearchBox.ClearTextOnFocus = false
 	SearchBox.FontFace = WinWare.MontserratMedium
 	SearchBox.PlaceholderText = "Search"
+	SearchBox.PlaceholderColor3 = Color3.fromRGB(76, 76, 76)
 	SearchBox.Text = ""
-	SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-	SearchBox.TextSize = 13.000
-	SearchBox.TextTransparency = 1
+	SearchBox.TextColor3 = Color3.fromRGB(206, 206, 206)
+	SearchBox.TextSize = 14.000
+	SearchBox.TextTransparency = 0.350
 	SearchBox.TextXAlignment = Enum.TextXAlignment.Left
 
 	TabContainer.Name = WinWare.RandomString();
@@ -5321,35 +5430,9 @@ function WinWare:CreateWindow(Config)
 	do
 		Window.Searching = false;
 		local Input = WinWare:CreateInput(SearchIcon , LPH_NO_VIRTUALIZE(function()
-			Window.Searching = not Window.Searching;
+			Window.Searching = true;
 
-			if Window.Searching then
-				WinWare.PlayAnimate(SearchFrame , VSlowTween , {
-					Size = UDim2.new(0, 220, 0, 30)
-				})
-
-				WinWare.PlayAnimate(SearchIcon , SlowyTween , {
-					TextTransparency = 0.25
-				})
-
-				WinWare.PlayAnimate(SearchBox , VSlowTween , {
-					TextTransparency = 0.050
-				})
-			else
-				WinWare.PlayAnimate(SearchFrame , VSlowTween , {
-					Size = UDim2.new(0, 30, 0, 30)
-				})
-
-				WinWare.PlayAnimate(SearchIcon , SlowyTween , {
-					TextTransparency = 0.45
-				})
-
-				WinWare.PlayAnimate(SearchBox , SlowyTween , {
-					TextTransparency = 1
-				})
-
-				SearchBox.Text = "";
-			end;
+			SearchBox:CaptureFocus();
 		end));	
 
 		local wati_for_finish = tick();
@@ -5480,8 +5563,12 @@ function WinWare:CreateWindow(Config)
 	function Window:AddTabLabel(Name: string)
 		local TabLabel = Instance.new("TextLabel")
 
+		local LabelOrder = (LeftScrollingFrame:GetAttribute("SidebarOrder") or 0) + 10;
+		LeftScrollingFrame:SetAttribute("SidebarOrder" , LabelOrder);
+
 		TabLabel.Name = WinWare.RandomString()
 		TabLabel.Parent = LeftScrollingFrame
+		TabLabel.LayoutOrder = LabelOrder
 		TabLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		TabLabel.BackgroundTransparency = 1.000
 		TabLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -5520,7 +5607,8 @@ function WinWare:CreateWindow(Config)
 		Config = WinWare:ProcessParams(Config , {
 			Icon = "crosshairs",
 			Name = "Tab",
-			Type = "Double"
+			Type = "Double",
+			Parent = false
 		});
 
 		local Tab = {
@@ -5532,22 +5620,40 @@ function WinWare:CreateWindow(Config)
 		local TabIcon = Instance.new("TextLabel")
 		local TabContentLabel = Instance.new("TextLabel")
 		local TabStroke = Instance.new("UIStroke")
+		local SubIndicator = Instance.new("TextLabel")
+		local SubHolder = Instance.new("Frame")
+		local SubList = Instance.new("Frame")
+		local SubLayout = Instance.new("UIListLayout")
+		local SubLine = Instance.new("Frame")
+		local SubLineCorner = Instance.new("UICorner")
+
+		local ParentTab = Config.Parent;
+		local IsSubTab = typeof(ParentTab) == "table" and ParentTab.SubList ~= nil;
+		local TabRoot = IsSubTab and ParentTab.SubList or LeftScrollingFrame;
+
+		local TabOrder = (LeftScrollingFrame:GetAttribute("SidebarOrder") or 0) + 10;
+		LeftScrollingFrame:SetAttribute("SidebarOrder" , TabOrder);
 
 		Tab.Idx = TabButton;
+		Tab.SubCount = 0;
+		Tab.SubExpanded = false;
+		Tab.SubHolder = SubHolder;
+		Tab.SubList = SubList;
 
 		TabButton.Name = WinWare.RandomString();
-		TabButton.Parent = LeftScrollingFrame
-		TabButton.BackgroundColor3 = Color3.fromRGB(18, 41, 85)
+		TabButton.Parent = TabRoot
+		TabButton.LayoutOrder = TabOrder
+		TabButton.BackgroundColor3 = Color3.fromRGB(60, 126, 255)
 		TabButton.BackgroundTransparency = 1
 		TabButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		TabButton.BorderSizePixel = 0
 		TabButton.Size = UDim2.new(1, -1, 0, 43)
 		TabButton.ZIndex = 8
 
-		UICorner.CornerRadius = UDim.new(0, 7)
+		UICorner.CornerRadius = UDim.new(0, 9)
 		UICorner.Parent = TabButton
-		TabStroke.Color = Color3.fromRGB(21, 40, 78)
-		TabStroke.Thickness = 1.3
+		TabStroke.Color = Color3.fromRGB(60, 126, 255)
+		TabStroke.Thickness = 2
 		TabStroke.Transparency = 1
 		TabStroke.Parent = TabButton
 
@@ -5582,6 +5688,124 @@ function WinWare:CreateWindow(Config)
 		TabContentLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 		TabContentLabel.TextSize = 15.000
 		TabContentLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+		SubIndicator.Name = WinWare.RandomString();
+		SubIndicator.Parent = TabButton
+		SubIndicator.AnchorPoint = Vector2.new(1, 0.5)
+		SubIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		SubIndicator.BackgroundTransparency = 1.000
+		SubIndicator.BorderSizePixel = 0
+		SubIndicator.Position = UDim2.new(1, -8, 0.5, 0)
+		SubIndicator.Size = UDim2.new(0, 16, 0, 16)
+		SubIndicator.ZIndex = 9
+		SubIndicator.FontFace = WinWare.BuiltInBold
+		SubIndicator.Text = "chevron-small-down"
+		SubIndicator.TextColor3 = Color3.fromRGB(219, 219, 219)
+		SubIndicator.TextSize = 15.000
+		SubIndicator.TextTransparency = 0.550
+		SubIndicator.TextWrapped = true
+		SubIndicator.Rotation = -90
+		SubIndicator.Visible = false
+
+		SubHolder.Name = WinWare.RandomString();
+		SubHolder.Parent = TabRoot
+		SubHolder.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		SubHolder.BackgroundTransparency = 1.000
+		SubHolder.BorderSizePixel = 0
+		SubHolder.ClipsDescendants = true
+		SubHolder.LayoutOrder = TabOrder + 1
+		SubHolder.Size = UDim2.new(1, -1, 0, 0)
+		SubHolder.ZIndex = 8
+		SubHolder.Visible = false
+
+		SubLine.Name = WinWare.RandomString();
+		SubLine.Parent = SubHolder
+		SubLine.BackgroundColor3 = Color3.fromRGB(219, 219, 219)
+		SubLine.BackgroundTransparency = 0.900
+		SubLine.BorderSizePixel = 0
+		SubLine.Position = UDim2.new(0, 10, 0, 3)
+		SubLine.Size = UDim2.new(0, 2, 1, -8)
+		SubLine.ZIndex = 8
+
+		SubLineCorner.CornerRadius = UDim.new(1, 0)
+		SubLineCorner.Parent = SubLine
+
+		SubList.Name = WinWare.RandomString();
+		SubList.Parent = SubHolder
+		SubList.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		SubList.BackgroundTransparency = 1.000
+		SubList.BorderSizePixel = 0
+		SubList.Position = UDim2.new(0, 22, 0, 2)
+		SubList.Size = UDim2.new(1, -22, 1, -2)
+		SubList.ZIndex = 8
+
+		SubLayout.Parent = SubList
+		SubLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+		SubLayout.SortOrder = Enum.SortOrder.LayoutOrder
+		SubLayout.Padding = UDim.new(0, 2)
+
+		Tab.RefreshSub = LPH_NO_VIRTUALIZE(function()
+			SubIndicator.Visible = Tab.SubCount > 0;
+
+			if Tab.SubExpanded and Tab.SubCount > 0 then
+				SubHolder.Size = UDim2.new(1, -1, 0, Tab.SubCount * 38 + 4);
+			end;
+		end);
+
+		Tab.SetSubExpanded = LPH_NO_VIRTUALIZE(function(state)
+			if Tab.SubCount == 0 then
+				Tab.SubExpanded = false;
+				SubHolder.Visible = false;
+				SubHolder.Size = UDim2.new(1, -1, 0, 0);
+
+				return;
+			end;
+
+			Tab.SubExpanded = state;
+
+			if state then
+				SubHolder.Visible = true;
+
+				WinWare.PlayAnimate(SubHolder , VSlowTween , {
+					Size = UDim2.new(1, -1, 0, Tab.SubCount * 38 + 4)
+				});
+
+				WinWare.PlayAnimate(SubIndicator , SlowyTween , {
+					Rotation = 0,
+					TextTransparency = 0.250
+				});
+			else
+				WinWare.PlayAnimate(SubHolder , VSlowTween , {
+					Size = UDim2.new(1, -1, 0, 0)
+				});
+
+				WinWare.PlayAnimate(SubIndicator , SlowyTween , {
+					Rotation = -90,
+					TextTransparency = 0.550
+				});
+
+				task.delay(0.45 , LPH_NO_VIRTUALIZE(function()
+					if not Tab.SubExpanded then
+						SubHolder.Visible = false;
+					end;
+				end));
+			end;
+		end);
+
+		if IsSubTab then
+			TabButton.Size = UDim2.new(1, 0, 0, 36)
+			TabButton.LayoutOrder = ParentTab.SubCount + 1
+			TabIcon.Position = UDim2.new(0, 6, 0.5, 0)
+			TabIcon.Size = UDim2.new(0, 20, 0, 20)
+			TabIcon.TextSize = 16.000
+			TabContentLabel.Position = UDim2.new(0, 32, 0.5, 0)
+			TabContentLabel.Size = UDim2.new(1, -38, 0, 16)
+			TabContentLabel.TextSize = 13.000
+			SubHolder.LayoutOrder = ParentTab.SubCount + 2
+
+			ParentTab.SubCount = ParentTab.SubCount + 1;
+			ParentTab.RefreshSub();
+		end;
 
 		local TabFrame = Instance.new("Frame")
 		local LeftScroll = Instance.new("ScrollingFrame")
@@ -5672,18 +5896,18 @@ function WinWare:CreateWindow(Config)
 
 			if value then
 				WinWare.PlayAnimate(TabButton , SlowyTween , {
-					BackgroundTransparency = 0.900
+					BackgroundTransparency = 0.960
 				})
-				WinWare.PlayAnimate(TabStroke , SlowyTween , {Transparency = 0.750})
+				WinWare.PlayAnimate(TabStroke , SlowyTween , {Transparency = 0.900})
 
 				WinWare.PlayAnimate(TabIcon , SlowyTween , {
 					TextTransparency = 0,
-					TextColor3 = WinWare.AccentColor
+					TextColor3 = Color3.fromRGB(60, 126, 255)
 				})
 
 				WinWare.PlayAnimate(TabContentLabel , SlowyTween , {
 					TextTransparency = 0,
-					TextColor3 = WinWare.AccentColor
+					TextColor3 = Color3.fromRGB(60, 126, 255)
 				})
 			else
 				WinWare.PlayAnimate(TabButton , SlowyTween , {
@@ -5693,12 +5917,12 @@ function WinWare:CreateWindow(Config)
 
 				WinWare.PlayAnimate(TabIcon , SlowyTween , {
 					TextTransparency = 0.5,
-					TextColor3 = Color3.fromRGB(252, 252, 252)
+					TextColor3 = Color3.fromRGB(219, 219, 219)
 				})
 
 				WinWare.PlayAnimate(TabContentLabel , SlowyTween , {
 					TextTransparency = 0,
-					TextColor3 = Color3.fromRGB(206, 206, 206)
+					TextColor3 = Color3.fromRGB(219, 219, 219)
 				})
 			end;
 		end);
@@ -5711,7 +5935,7 @@ function WinWare:CreateWindow(Config)
 			Tab.SetValue(false);
 		end;
 
-		WinWare:CreateInput(TabButton,LPH_NO_VIRTUALIZE(function()
+		local TabInput = WinWare:CreateInput(TabButton,LPH_NO_VIRTUALIZE(function()
 			for i,v in next , Window.Tabs do
 				if v.Idx == TabButton then
 					v.SetValue(true);
@@ -5720,7 +5944,15 @@ function WinWare:CreateWindow(Config)
 					v.SetValue(false);
 				end;
 			end;
+
+			if IsSubTab and not ParentTab.SubExpanded then
+				ParentTab.SetSubExpanded(true);
+			end;
 		end));
+
+		WinWare:AddSignal(TabInput.MouseButton2Click:Connect(LPH_NO_VIRTUALIZE(function()
+			Tab.SetSubExpanded(not Tab.SubExpanded);
+		end)));
 
 		Window.Signal:Connect(LPH_NO_VIRTUALIZE(function(value)
 			if value then
