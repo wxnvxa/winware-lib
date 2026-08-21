@@ -4723,7 +4723,6 @@ function WinWare:CreateWindow(Config)
 	FadeAlpha.Value = 0;
 
 	local FadeItems = {};
-	local FadeTracked = setmetatable({} , { __mode = "k" });
 	local FadeVisible = false;
 
 	local CaptureFadeItem = LPH_NO_VIRTUALIZE(function(Object)
@@ -4781,45 +4780,27 @@ function WinWare:CreateWindow(Config)
 			local Item = FadeItems[Index];
 
 			if (Alpha <= 0.020 and not Item.Object.Parent) or not pcall(ApplyFadeItem , Item , Alpha) then
-				FadeTracked[Item.Object] = nil;
 				table.remove(FadeItems , Index);
 			end;
 		end;
 	end);
 
-	local TrackFadeItem = LPH_NO_VIRTUALIZE(function(Object)
-		if FadeTracked[Object] then
-			return nil;
-		end;
-
-		local Item = CaptureFadeItem(Object);
-
-		if not Item then
-			return nil;
-		end;
-
-		FadeTracked[Object] = true;
-		table.insert(FadeItems , Item);
-
-		return Item;
-	end);
-
 	local CaptureFade = LPH_NO_VIRTUALIZE(function()
-		for _ , Object in ipairs(WindowFrame:GetDescendants()) do
-			TrackFadeItem(Object);
+		if FadeAlpha.Value > 0.020 then
+			return;
 		end;
-	end);
 
-	local RefreshFade = LPH_NO_VIRTUALIZE(function()
-		CaptureFade();
+		local Items = {};
 
-		for Index = #FadeItems , 1 , -1 do
-			local Fresh = CaptureFadeItem(FadeItems[Index].Object);
+		for _ , Object in ipairs(WindowFrame:GetDescendants()) do
+			local Item = CaptureFadeItem(Object);
 
-			if Fresh then
-				FadeItems[Index] = Fresh;
+			if Item then
+				table.insert(Items , Item);
 			end;
 		end;
+
+		FadeItems = Items;
 	end);
 
 	local ScaledSize = LPH_NO_VIRTUALIZE(function(Factor)
@@ -4831,14 +4812,19 @@ function WinWare:CreateWindow(Config)
 	WinWare:AddSignal(FadeAlpha:GetPropertyChangedSignal('Value'):Connect(ApplyFade));
 
 	WinWare:AddSignal(WindowFrame.DescendantAdded:Connect(LPH_NO_VIRTUALIZE(function(Object)
+		if FadeAlpha.Value <= 0.020 then
+			return;
+		end;
+
 		task.defer(function()
-			if not Object.Parent then
+			if FadeAlpha.Value <= 0.020 or not Object.Parent then
 				return;
 			end;
 
-			local Item = TrackFadeItem(Object);
+			local Item = CaptureFadeItem(Object);
 
-			if Item and FadeAlpha.Value > 0.020 then
+			if Item then
+				table.insert(FadeItems , Item);
 				ApplyFadeItem(Item , FadeAlpha.Value);
 			end;
 		end);
@@ -4880,9 +4866,7 @@ function WinWare:CreateWindow(Config)
 
 			Window.Shadow:Render(true);
 		else
-			if FadeAlpha.Value <= 0.020 then
-				RefreshFade();
-			end;
+			CaptureFade();
 
 			FadeVisible = false;
 
