@@ -37,6 +37,9 @@ local ManualTween = TweenInfo.new(0.1);
 local SlowyTween = TweenInfo.new(0.175);
 local FastTween = TweenInfo.new(0.05);
 local VSlowTween = TweenInfo.new(0.5,Enum.EasingStyle.Quint);
+local WindowFadeTween = TweenInfo.new(0.320,Enum.EasingStyle.Quint,Enum.EasingDirection.Out);
+local WindowPopTween = TweenInfo.new(0.440,Enum.EasingStyle.Back,Enum.EasingDirection.Out);
+local WindowHideTween = TweenInfo.new(0.220,Enum.EasingStyle.Quint,Enum.EasingDirection.In);
 local Encryption = {};
 
 local function ResolveUserThumbnail(User)
@@ -1665,7 +1668,7 @@ function WinWare:CreateOptionWindow(Frame: Frame , Zindex)
 	OptionHandler.AnchorPoint = Vector2.new(0, 0)
 	OptionHandler.BackgroundColor3 = WinWare.PopupSurfaceColor
 	OptionHandler.BackgroundTransparency = 0.100
-	WinWare.ApplyPopupSurface(OptionHandler , 0.100);
+	WinWare.ApplyPopupSurface(OptionHandler , 0.040);
 	OptionHandler.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	OptionHandler.BorderSizePixel = 0
 	OptionHandler.ClipsDescendants = true
@@ -1802,7 +1805,7 @@ function WinWare:CreateModuleOptionWindow(Trigger: Frame, Zindex, Config)
 	Root.AnchorPoint = Vector2.new(0.5, 0.5)
 	Root.BackgroundColor3 = WinWare.PopupSurfaceColor
 	Root.BackgroundTransparency = 0.100
-	WinWare.ApplyPopupSurface(Root , 0.100);
+	WinWare.ApplyPopupSurface(Root , 0.040);
 	Root.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	Root.BorderSizePixel = 0
 	Root.ClipsDescendants = true
@@ -2024,7 +2027,7 @@ function WinWare:CreateColorPicker(HandleFrame: Frame)
 	ColorPickerHandler.AnchorPoint = Vector2.new(0, 0)
 	ColorPickerHandler.BackgroundColor3 = WinWare.PopupSurfaceColor
 	ColorPickerHandler.BackgroundTransparency = 0.100
-	WinWare.ApplyPopupSurface(ColorPickerHandler , 0.100);
+	WinWare.ApplyPopupSurface(ColorPickerHandler , 0.040);
 	ColorPickerHandler.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	ColorPickerHandler.BorderSizePixel = 0
 	ColorPickerHandler.ClipsDescendants = true
@@ -3505,7 +3508,7 @@ function WinWare:RegisiterHandler(Handler: Frame , Signal)
 			DropdownHandler.AnchorPoint = Vector2.new(0.5, 0)
 			DropdownHandler.BackgroundColor3 = WinWare.PopupSurfaceColor
 			DropdownHandler.BackgroundTransparency = 0.100
-			WinWare.ApplyPopupSurface(DropdownHandler , 0.100);
+			WinWare.ApplyPopupSurface(DropdownHandler , 0.040);
 			DropdownHandler.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			DropdownHandler.BorderSizePixel = 0
 			DropdownHandler.ClipsDescendants = true
@@ -3989,7 +3992,7 @@ function WinWare:CreateToolTips(Container: Frame , Name: string , Content: strin
 	Tooltips.Name = WinWare.RandomString();
 	Tooltips.BackgroundColor3 = WinWare.PopupSurfaceColor
 	Tooltips.BackgroundTransparency = 0.100
-	WinWare.ApplyPopupSurface(Tooltips , 0.100);
+	WinWare.ApplyPopupSurface(Tooltips , 0.040);
 	Tooltips.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	Tooltips.BorderSizePixel = 0
 	Tooltips.ClipsDescendants = true
@@ -4474,21 +4477,21 @@ function WinWare:RegisiterItem(Frame: Frame , Signel)
 		UserLabel.BackgroundTransparency = 1.000
 		UserLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		UserLabel.BorderSizePixel = 0
-		UserLabel.Position = UDim2.new(0, 70, 0, 17)
-		UserLabel.Size = UDim2.new(1, -82, 0, 18)
+		UserLabel.Position = UDim2.new(0, 68, 0, 22)
+		UserLabel.Size = UDim2.new(1, -80, 0, 18)
 		UserLabel.ZIndex = LayerIndex + 9
-		UserLabel.FontFace = WinWare.MontserratMedium
+		UserLabel.FontFace = WinWare.MontserratSemiBold
 		UserLabel.Text = Name or WinWare.UserName or 'User'
-		UserLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-		UserLabel.TextSize = 14.000
-		UserLabel.TextTransparency = 0.200
+		UserLabel.TextColor3 = Color3.fromRGB(206, 206, 206)
+		UserLabel.TextSize = 15.000
+		UserLabel.TextTransparency = 0
 		UserLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 		LineFrame.Name = WinWare.RandomString();
 		LineFrame.Parent = UserFrame
 		LineFrame.AnchorPoint = Vector2.new(0.5, 1)
-		LineFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-		LineFrame.BackgroundTransparency = 0.650
+		LineFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		LineFrame.BackgroundTransparency = 0.970
 		LineFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		LineFrame.BorderSizePixel = 0
 		LineFrame.Position = UDim2.new(0.5, 0, 1, 0)
@@ -4504,17 +4507,26 @@ function WinWare:RegisiterItem(Frame: Frame , Signel)
 		LogoImage.BackgroundTransparency = 1.000
 		LogoImage.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		LogoImage.BorderSizePixel = 0
-		LogoImage.Position = UDim2.new(0, 10, 0, 10)
-		LogoImage.Size = UDim2.new(0, 58, 0, 58)
+		LogoImage.AnchorPoint = Vector2.new(0, 0.5)
+		LogoImage.Position = UDim2.new(0, 10, 0.5, 0)
+		LogoImage.Size = UDim2.new(0, 50, 0, 50)
 		LogoImage.ZIndex = LayerIndex + 9
 		LogoImage.Image = Profile or WinWare.UserProfile;
 
 		UICorner_2.CornerRadius = UDim.new(1, 0)
 		UICorner_2.Parent = LogoImage
 		local ProfileStroke = Instance.new("UIStroke")
-		ProfileStroke.Color = Color3.fromRGB(77, 255, 158)
-		ProfileStroke.Thickness = 2.2
+		ProfileStroke.Color = Color3.fromRGB(255, 255, 255)
+		ProfileStroke.Thickness = 2.5
 		ProfileStroke.Parent = LogoImage
+
+		local ProfileStrokeGradient = Instance.new("UIGradient", ProfileStroke)
+		ProfileStrokeGradient.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(27, 39, 88)),
+			ColorSequenceKeypoint.new(0.5, Color3.fromRGB(60, 126, 255)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(96, 156, 255)),
+		})
+		ProfileStrokeGradient.Rotation = 45
 
 		UserStatusLabel.Name = WinWare.RandomString();
 		UserStatusLabel.Parent = UserFrame
@@ -4522,14 +4534,14 @@ function WinWare:RegisiterItem(Frame: Frame , Signel)
 		UserStatusLabel.BackgroundTransparency = 1.000
 		UserStatusLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		UserStatusLabel.BorderSizePixel = 0
-		UserStatusLabel.Position = UDim2.new(0, 70, 0, 40)
-		UserStatusLabel.Size = UDim2.new(1, -82, 0, 16)
+		UserStatusLabel.Position = UDim2.new(0, 68, 0, 42)
+		UserStatusLabel.Size = UDim2.new(1, -80, 0, 16)
 		UserStatusLabel.ZIndex = LayerIndex + 9
-		UserStatusLabel.FontFace = WinWare.MontserratMedium
+		UserStatusLabel.FontFace = WinWare.MontserratSemiBold
 		UserStatusLabel.Text = Expires or 'Never'
-		UserStatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-		UserStatusLabel.TextSize = 11.000
-		UserStatusLabel.TextTransparency = 0.200
+		UserStatusLabel.TextColor3 = Color3.fromRGB(145, 145, 145)
+		UserStatusLabel.TextSize = 12.000
+		UserStatusLabel.TextTransparency = 0
 		UserStatusLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 		local UserFrameItem = {};
@@ -4669,12 +4681,13 @@ function WinWare:CreateWindow(Config)
 	WinWare.MainWindowFrame = WindowFrame;
 	WindowFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 	WindowFrame.BackgroundColor3 = Color3.fromRGB(11, 11, 11)
-	WindowFrame.BackgroundTransparency = 0.100
+	WindowFrame.BackgroundTransparency = 1
 	WindowFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	WindowFrame.BorderSizePixel = 0
 	WindowFrame.ClipsDescendants = true
 	WindowFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 	WindowFrame.Size = Window.Size
+	WindowFrame.Visible = false;
 	WindowFrame.Active = true;
 
 	local renderParentWindow = LPH_NO_VIRTUALIZE(function()
@@ -4706,179 +4719,150 @@ function WinWare:CreateWindow(Config)
 
 	WinWare:AddSignal(WindowFrame:GetPropertyChangedSignal('BackgroundTransparency'):Connect(renderParentWindow))
 
+	local FadeAlpha = Instance.new("NumberValue");
+	FadeAlpha.Value = 0;
+
+	local FadeItems = {};
+
+	local CaptureFadeItem = LPH_NO_VIRTUALIZE(function(Object)
+		if Object:IsA("UIStroke") then
+			return { Object = Object , Stroke = Object.Transparency };
+		elseif Object:IsA("GuiObject") then
+			local Item = { Object = Object , Background = Object.BackgroundTransparency };
+
+			if Object:IsA("TextLabel") or Object:IsA("TextButton") or Object:IsA("TextBox") then
+				Item.Text = Object.TextTransparency;
+			end;
+
+			if Object:IsA("ImageLabel") or Object:IsA("ImageButton") then
+				Item.Image = Object.ImageTransparency;
+			end;
+
+			if Object:IsA("ScrollingFrame") then
+				Item.ScrollBar = Object.ScrollBarImageTransparency;
+			end;
+
+			return Item;
+		end;
+
+		return nil;
+	end);
+
+	local ApplyFadeItem = LPH_NO_VIRTUALIZE(function(Item , Alpha)
+		local Object = Item.Object;
+
+		if Item.Background then
+			Object.BackgroundTransparency = Item.Background + (1 - Item.Background) * Alpha;
+		end;
+
+		if Item.Text then
+			Object.TextTransparency = Item.Text + (1 - Item.Text) * Alpha;
+		end;
+
+		if Item.Image then
+			Object.ImageTransparency = Item.Image + (1 - Item.Image) * Alpha;
+		end;
+
+		if Item.ScrollBar then
+			Object.ScrollBarImageTransparency = Item.ScrollBar + (1 - Item.ScrollBar) * Alpha;
+		end;
+
+		if Item.Stroke then
+			Object.Transparency = Item.Stroke + (1 - Item.Stroke) * Alpha;
+		end;
+	end);
+
+	local ApplyFade = LPH_NO_VIRTUALIZE(function()
+		local Alpha = FadeAlpha.Value;
+
+		for Index = #FadeItems , 1 , -1 do
+			local Item = FadeItems[Index];
+
+			if Item.Object.Parent then
+				ApplyFadeItem(Item , Alpha);
+			else
+				table.remove(FadeItems , Index);
+			end;
+		end;
+	end);
+
+	local CaptureFade = LPH_NO_VIRTUALIZE(function()
+		FadeItems = {};
+
+		for _ , Object in ipairs(WindowFrame:GetDescendants()) do
+			local Item = CaptureFadeItem(Object);
+
+			if Item then
+				table.insert(FadeItems , Item);
+			end;
+		end;
+	end);
+
+	local ScaledSize = LPH_NO_VIRTUALIZE(function(Factor)
+		local Base = Window.Size;
+
+		return UDim2.new(Base.X.Scale * Factor , math.floor(Base.X.Offset * Factor) , Base.Y.Scale * Factor , math.floor(Base.Y.Offset * Factor));
+	end);
+
+	WinWare:AddSignal(FadeAlpha:GetPropertyChangedSignal('Value'):Connect(ApplyFade));
+
+	WinWare:AddSignal(WindowFrame.DescendantAdded:Connect(LPH_NO_VIRTUALIZE(function(Object)
+		if FadeAlpha.Value <= 0.020 then
+			return;
+		end;
+
+		task.defer(function()
+			if FadeAlpha.Value <= 0.020 or not Object.Parent then
+				return;
+			end;
+
+			local Item = CaptureFadeItem(Object);
+
+			if Item then
+				table.insert(FadeItems , Item);
+				ApplyFadeItem(Item , FadeAlpha.Value);
+			end;
+		end);
+	end)))
+
+	Window.PrepareFade = LPH_NO_VIRTUALIZE(function()
+		CaptureFade();
+
+		FadeAlpha.Value = 1;
+		WindowFrame.Size = ScaledSize(0.940);
+		WindowFrame.BackgroundTransparency = 1;
+		WindowFrame.Visible = true;
+	end);
+
 	Window.SetRender = LPH_NO_VIRTUALIZE(function(self , value)
 		if value then
-			WinWare.PlayAnimate(WindowFrame , SlowyTween , {
-				BackgroundTransparency = 0.100,
+			WindowFrame.Visible = true;
+
+			WinWare.PlayAnimate(WindowFrame , WindowFadeTween , {
+				BackgroundTransparency = 0.040
+			})
+
+			WinWare.PlayAnimate(WindowFrame , WindowPopTween , {
 				Size = Window.Size
 			})
 
-			WinWare.PlayAnimate(LogoImage , SlowyTween , {
-				ImageTransparency = 0
-			})
-
-			WinWare.PlayAnimate(WindowName , SlowyTween , {
-				TextTransparency = 0
-			})
-
-			WinWare.PlayAnimate(WindowContent , SlowyTween , {
-				TextTransparency = 0.650
-			})
-
-			WinWare.PlayAnimate(LineFrame , SlowyTween , {
-				BackgroundTransparency = 0.950
-			})
-
-			WinWare.PlayAnimate(AccountProfile , SlowyTween , {
-				ImageTransparency = 0
-			})
-
-			WinWare.PlayAnimate(AccountName , SlowyTween , {
-				TextTransparency = 0
-			})
-
-			WinWare.PlayAnimate(ExpireLabel , SlowyTween , {
-				TextTransparency = 0
-			})
-
-			WinWare.PlayAnimate(LineFrame_2 , SlowyTween , {
-				BackgroundTransparency = 0.950
-			})
-
-			WinWare.PlayAnimate(UserSettingButton , SlowyTween , {
-				TextTransparency = 0.5
-			})
-
-			WinWare.PlayAnimate(RightMenuFrame , SlowyTween , {
-				BackgroundTransparency = 1
-			})
-
-			WinWare.PlayAnimate(VerticalDivider , SlowyTween , {
-				BackgroundTransparency = 0.950
-			})
-
-			WinWare.PlayAnimate(LineFrame_3 , SlowyTween , {
-				BackgroundTransparency = 0.950
-			})
-
-			WinWare.PlayAnimate(ConfigFrame , SlowyTween , {
-				BackgroundTransparency = 0.750
-			})
-
-			WinWare.PlayAnimate(UIStroke_2 , SlowyTween , {
-				Transparency = 0.650
-			})
-
-			WinWare.PlayAnimate(ConfigIcon , SlowyTween , {
-				TextTransparency = 0.250
-			})
-
-			WinWare.PlayAnimate(LineFrame_4 , SlowyTween , {
-				BackgroundTransparency = 0.650
-			})
-
-			WinWare.PlayAnimate(ConfigName , SlowyTween , {
-				TextTransparency = 0.350
-			})
-
-			WinWare.PlayAnimate(ConfigBthIcon , SlowyTween , {
-				TextTransparency = 0.250
-			})
-
-			WinWare.PlayAnimate(SearchIcon , SlowyTween , {
-				TextTransparency = 0.250
-			})
-
-			WinWare.PlayAnimate(SearchBox , SlowyTween , {
-				TextTransparency = 0.350
+			WinWare.PlayAnimate(FadeAlpha , WindowFadeTween , {
+				Value = 0
 			})
 
 			Window.Shadow:Render(true);
 		else
+			if FadeAlpha.Value <= 0.020 then
+				CaptureFade();
+			end;
 
-			WinWare.PlayAnimate(WindowFrame , SlowyTween , {
+			WinWare.PlayAnimate(WindowFrame , WindowHideTween , {
 				BackgroundTransparency = 1,
-				Size = Window.Size + UDim2.fromOffset(-15,-15)
+				Size = ScaledSize(0.940)
 			})
 
-			WinWare.PlayAnimate(LogoImage , SlowyTween , {
-				ImageTransparency = 1
-			})
-
-			WinWare.PlayAnimate(WindowName , SlowyTween , {
-				TextTransparency = 1
-			})
-
-			WinWare.PlayAnimate(WindowContent , SlowyTween , {
-				TextTransparency = 1
-			})
-
-			WinWare.PlayAnimate(LineFrame , SlowyTween , {
-				BackgroundTransparency = 1
-			})
-
-			WinWare.PlayAnimate(AccountProfile , SlowyTween , {
-				ImageTransparency = 1
-			})
-
-			WinWare.PlayAnimate(AccountName , SlowyTween , {
-				TextTransparency = 1
-			})
-
-			WinWare.PlayAnimate(ExpireLabel , SlowyTween , {
-				TextTransparency = 1
-			})
-
-			WinWare.PlayAnimate(LineFrame_2 , SlowyTween , {
-				BackgroundTransparency = 1
-			})
-
-			WinWare.PlayAnimate(UserSettingButton , SlowyTween , {
-				TextTransparency = 1
-			})
-
-			WinWare.PlayAnimate(RightMenuFrame , SlowyTween , {
-				BackgroundTransparency = 1
-			})
-
-			WinWare.PlayAnimate(VerticalDivider , SlowyTween , {
-				BackgroundTransparency = 1
-			})
-
-			WinWare.PlayAnimate(LineFrame_3 , SlowyTween , {
-				BackgroundTransparency = 1
-			})
-
-			WinWare.PlayAnimate(ConfigFrame , SlowyTween , {
-				BackgroundTransparency = 1
-			})
-
-			WinWare.PlayAnimate(UIStroke_2 , SlowyTween , {
-				Transparency = 1
-			})
-
-			WinWare.PlayAnimate(ConfigIcon , SlowyTween , {
-				TextTransparency = 1
-			})
-
-			WinWare.PlayAnimate(LineFrame_4 , SlowyTween , {
-				BackgroundTransparency = 1
-			})
-
-			WinWare.PlayAnimate(ConfigName , SlowyTween , {
-				TextTransparency = 1
-			})
-
-			WinWare.PlayAnimate(ConfigBthIcon , SlowyTween , {
-				TextTransparency = 1
-			})
-
-			WinWare.PlayAnimate(SearchIcon , SlowyTween , {
-				TextTransparency = 1
-			})
-
-			WinWare.PlayAnimate(SearchBox , SlowyTween , {
-				TextTransparency = 1
+			WinWare.PlayAnimate(FadeAlpha , WindowHideTween , {
+				Value = 1
 			})
 
 			Window.Shadow:Render(false);
@@ -4890,6 +4874,7 @@ function WinWare:CreateWindow(Config)
 
 	task.delay(0.25,function()
 		WindowFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+		Window.PrepareFade();
 		Window:SetRender(true);
 		WinWare:AddSignal(Window.Signal:Connect(LPH_NO_VIRTUALIZE(function(...)
 			Window:SetRender(...);
@@ -5074,25 +5059,10 @@ function WinWare:CreateWindow(Config)
 	local AccountStrokeGradient = Instance.new("UIGradient", AccountStroke)
 	AccountStrokeGradient.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(27, 39, 88)),
-		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(96, 156, 255)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(27, 39, 88)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(60, 126, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(96, 156, 255)),
 	})
 	AccountStrokeGradient.Rotation = 45
-	AccountStrokeGradient.Offset = Vector2.new(-1, 0)
-
-	task.spawn(LPH_NO_VIRTUALIZE(function()
-		while AccountStrokeGradient.Parent do
-			WinWare.PlayAnimate(AccountStrokeGradient , TweenInfo.new(2.4 , Enum.EasingStyle.Sine , Enum.EasingDirection.InOut) , {
-				Offset = Vector2.new(1, 0)
-			});
-
-			task.wait(3);
-
-			AccountStrokeGradient.Offset = Vector2.new(-1, 0);
-
-			task.wait(1.2);
-		end;
-	end));
 
 	AccountName.Name = WinWare.RandomString();
 	AccountName.Parent = BottomFrame
@@ -6260,7 +6230,7 @@ function WinWare:CreateWindow(Config)
 		ConfigMenu.AnchorPoint = Vector2.new(0.5, 0)
 		ConfigMenu.BackgroundColor3 = WinWare.PopupSurfaceColor
 		ConfigMenu.BackgroundTransparency = 0.100
-		WinWare.ApplyPopupSurface(ConfigMenu , 0.100);
+		WinWare.ApplyPopupSurface(ConfigMenu , 0.040);
 		ConfigMenu.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ConfigMenu.BorderSizePixel = 0
 		ConfigMenu.ClipsDescendants = true
@@ -7009,7 +6979,7 @@ function WinWare:CreateWindow(Config)
 		Watermark.Size = UDim2.new(0, 120, 0, 30)
 		Watermark.ZIndex = 16
 
-		WinWare.ApplyPopupSurface(Watermark , 0.100);
+		WinWare.ApplyPopupSurface(Watermark , 0.040);
 
 		UICorner.CornerRadius = UDim.new(0, 25)
 		UICorner.Parent = Watermark
@@ -7278,7 +7248,7 @@ function WinWare:CreateNotification()
 		NotifyFrame.Size = UDim2.new(0, 220, 0, 55)
 		NotifyFrame.ZIndex = 130
 
-		WinWare.ApplyPopupSurface(NotifyFrame , 0.100);
+		WinWare.ApplyPopupSurface(NotifyFrame , 0.040);
 
 		UICorner.CornerRadius = UDim.new(0, 10)
 		UICorner.Parent = NotifyFrame
