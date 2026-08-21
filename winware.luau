@@ -4918,18 +4918,16 @@ function WinWare:CreateWindow(Config)
 	UICorner.Parent = WindowFrame
 	local WindowStroke = Instance.new("UIStroke", WindowFrame)
 	WindowStroke.Color = Color3.fromRGB(255, 255, 255)
-	WindowStroke.Transparency = 0.930
+	WindowStroke.Transparency = 0.400
 	WindowStroke.Thickness = 1
 
 	local WindowStrokeGradient = Instance.new("UIGradient", WindowStroke)
 	WindowStrokeGradient.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-		ColorSequenceKeypoint.new(0.35, Color3.fromRGB(27, 39, 88)),
-		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(60, 126, 255)),
-		ColorSequenceKeypoint.new(0.65, Color3.fromRGB(27, 39, 88)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(27, 39, 88)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(96, 156, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(27, 39, 88)),
 	})
-	WindowStrokeGradient.Rotation = 20
+	WindowStrokeGradient.Rotation = 25
 	WindowStrokeGradient.Offset = Vector2.new(-1, 0)
 
 	task.spawn(LPH_NO_VIRTUALIZE(function()
@@ -4998,16 +4996,16 @@ function WinWare:CreateWindow(Config)
 	local WindowNameGradient = Instance.new("UIGradient", WindowName)
 	WindowNameGradient.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(27, 39, 88)),
-		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 86, 255)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 126, 255)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(96, 156, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(27, 39, 88)),
 	})
 	WindowNameGradient.Rotation = 0
 	WinWare:EnableTextShimmer(WindowName, WindowNameGradient, {
 		BaseColor = Color3.fromRGB(27, 39, 88),
-		PeakColors = { Color3.fromRGB(0, 86, 255), Color3.fromRGB(60, 126, 255) },
+		PeakColors = { Color3.fromRGB(27, 39, 88), Color3.fromRGB(96, 156, 255) },
 		BandCount = 0.6,
 		BandWidth = 0.75,
-		SweepTime = 1.8,
+		SweepTime = 2,
 		FitToText = true,
 	});
 
@@ -5054,7 +5052,7 @@ function WinWare:CreateWindow(Config)
 	LeftScrollingFrame.ScrollBarImageTransparency = 0.850
 	LeftScrollingFrame.ScrollingDirection = Enum.ScrollingDirection.Y
 	LeftScrollingFrame.ElasticBehavior = Enum.ElasticBehavior.Never
-	LeftScrollingFrame.VerticalScrollBarInset = Enum.ScrollBarInset.None
+	LeftScrollingFrame.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
 
 	UIListLayout.Parent = LeftScrollingFrame
 	UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
@@ -5113,17 +5111,18 @@ function WinWare:CreateWindow(Config)
 	AccountName.TextTruncate = Enum.TextTruncate.AtEnd;
 	local AccountNameGradient = Instance.new("UIGradient", AccountName)
 	AccountNameGradient.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(219, 219, 219)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 126, 255)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(43, 62, 127)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(127, 176, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(43, 62, 127)),
 	})
 	AccountNameGradient.Rotation = 0
 	WinWare:EnableTextShimmer(AccountName, AccountNameGradient, {
-		BaseColor = Color3.fromRGB(219, 219, 219),
-		PeakColors = { Color3.fromRGB(60, 126, 255), Color3.fromRGB(0, 86, 255) },
+		BaseColor = Color3.fromRGB(43, 62, 127),
+		PeakColors = { Color3.fromRGB(43, 62, 127), Color3.fromRGB(127, 176, 255) },
 		BandCount = 0.6,
 		BandWidth = 0.75,
 		SweepTime = 2.2,
-		FitToText = false,
+		FitToText = true,
 	});
 
 	ExpireLabel.Name = WinWare.RandomString();
@@ -5647,7 +5646,7 @@ function WinWare:CreateWindow(Config)
 		TabButton.BackgroundTransparency = 1
 		TabButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		TabButton.BorderSizePixel = 0
-		TabButton.Size = UDim2.new(1, -1, 0, 43)
+		TabButton.Size = UDim2.new(1, -6, 0, 43)
 		TabButton.ZIndex = 8
 
 		UICorner.CornerRadius = UDim.new(0, 9)
@@ -5723,8 +5722,8 @@ function WinWare:CreateWindow(Config)
 		SubLine.BackgroundColor3 = Color3.fromRGB(219, 219, 219)
 		SubLine.BackgroundTransparency = 0.900
 		SubLine.BorderSizePixel = 0
-		SubLine.Position = UDim2.new(0, 10, 0, 3)
-		SubLine.Size = UDim2.new(0, 2, 1, -8)
+		SubLine.Position = UDim2.new(0, 12, 0, 6)
+		SubLine.Size = UDim2.new(0, 2, 1, -12)
 		SubLine.ZIndex = 8
 
 		SubLineCorner.CornerRadius = UDim.new(1, 0)
@@ -5735,8 +5734,8 @@ function WinWare:CreateWindow(Config)
 		SubList.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		SubList.BackgroundTransparency = 1.000
 		SubList.BorderSizePixel = 0
-		SubList.Position = UDim2.new(0, 22, 0, 2)
-		SubList.Size = UDim2.new(1, -22, 1, -2)
+		SubList.Position = UDim2.new(0, 26, 0, 4)
+		SubList.Size = UDim2.new(1, -32, 1, -8)
 		SubList.ZIndex = 8
 
 		SubLayout.Parent = SubList
@@ -5748,7 +5747,7 @@ function WinWare:CreateWindow(Config)
 			SubIndicator.Visible = Tab.SubCount > 0;
 
 			if Tab.SubExpanded and Tab.SubCount > 0 then
-				SubHolder.Size = UDim2.new(1, -1, 0, Tab.SubCount * 38 + 4);
+				SubHolder.Size = UDim2.new(1, -1, 0, Tab.SubCount * 38 + 8);
 			end;
 		end);
 
@@ -5767,7 +5766,7 @@ function WinWare:CreateWindow(Config)
 				SubHolder.Visible = true;
 
 				WinWare.PlayAnimate(SubHolder , VSlowTween , {
-					Size = UDim2.new(1, -1, 0, Tab.SubCount * 38 + 4)
+					Size = UDim2.new(1, -1, 0, Tab.SubCount * 38 + 8)
 				});
 
 				WinWare.PlayAnimate(SubIndicator , SlowyTween , {
